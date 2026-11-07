@@ -16,6 +16,7 @@ KnAIghts is an open-source InterSystems IRIS-based platform for coordinating AI-
 - Typed requests and responses through an InterSystems Interoperability production.
 - Auditable dispositions that can be checked against message records.
 - An authenticated Codex MCP seat and a native AI Hub agent route.
+- Operator-approved synthetic task updates with evidence revisions and duplicate-request checks.
 
 ## How it works
 
@@ -72,6 +73,8 @@ The native AI Hub agent reviews the same cases through `KnAIghts.Review.App.Subm
 
 Use the [independent verification instructions](docs/INTEROPERABILITY.md#verify-the-demonstration) to compare returned audit IDs and responses against stored dispositions and Interoperability messages.
 
+After a source-conflict review, an operator can propose, inspect, approve, and complete one [synthetic review task](docs/SYNTHETIC-TASK.md). Approval stays tied to the reviewed evidence. A changed evidence revision requires new approval, and a repeated execution request returns the original receipt.
+
 ## Current development status
 
 **Version 0.1.0 candidate.** Native AI Hub and authenticated Codex MCP workflows have been demonstrated locally on Community Build 154 for the two synthetic cases, with independent audit and message checks. Citation rejection and source-mismatch controls have also been exercised.
@@ -80,9 +83,10 @@ The native route currently supports the existing local `gpt-oss:20b` configurati
 
 This is an early development application for demonstration and testing. Restrict ingress to trusted, configured interfaces. Trusted internal callers can construct principal attribution, and audit records represent individual attempts. Human review currently produces an auditable disposition. Durable reviewer delivery is planned.
 
+The synthetic task API has passed sequential state, permission, evidence-change, rollback, and reinstall checks. Concurrent first-execution testing remains incomplete. See the [task guide](docs/SYNTHETIC-TASK.md) for its supported scope.
+
 ## Roadmap
 
-- Evidence-bound approval and synthetic execution that reject stale approvals and duplicate effects.
 - Reusable workflows and shared session context.
 - A dashboard, Round Table interface, and Book of Receipts.
 - Additional model and tool seats with declared capabilities and permissions.

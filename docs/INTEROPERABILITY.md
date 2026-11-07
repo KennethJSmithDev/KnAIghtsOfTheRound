@@ -107,7 +107,7 @@ Set sc=##class(%IPM.Main).ShellScript("uninstall knaights-of-the-round -v")
 Do $SYSTEM.Status.DisplayError(sc)
 ```
 
-Uninstall removes package classes and registration. Synthetic audit records remain for review. Reinstall using the same archive and start explicitly as above. Registry publication is a separate maintainer action. See the [official IPM installation guide](https://github.com/intersystems/ipm) and [manifest lifecycle reference](https://github.com/intersystems/ipm/wiki/03.-IPM-Manifest-(module.xml)).
+Uninstall removes package classes and registration. Synthetic audit records and task history remain for review. Reinstall using the same archive and start explicitly as above. Registry publication is a separate maintainer action. See the [official IPM installation guide](https://github.com/intersystems/ipm) and [manifest lifecycle reference](https://github.com/intersystems/ipm/wiki/03.-IPM-Manifest-(module.xml)).
 
 ## Verify the demonstration
 
@@ -170,6 +170,7 @@ The public source includes this scope summary. Exact logs, credentials, transcri
 | Standalone native model route, November 7 | PASS in a fresh isolated candidate fixture. Two `%AI.Agent` submissions, four provider completions, one ReadEvidence tool call per case, accepted matching selection and mismatch review. Independent persisted audit and two message-route sessions matched. Graceful production/container stop, exit 0, no OOM. |
 | Deterministic trusted-proposal regression, November 7 | PASS for matching selection, mismatch review, forced selection rejection, unsupported citation rejection, H000 admission denial and exact audit readback. |
 | IPM installation | PASS with client 0.10.9 on Build 154 for source load, exact-source TGZ installation, explicit production start, synthetic tests and audit readback, restart persistence, uninstall and same-artifact reinstall. Registry publication remains pending. Build 109 compatibility is unverified. |
+| Synthetic task contract | Sequential proposal, approval, revised evidence, stale-approval rejection, one task update and duplicate receipt reconciliation passed. Authenticated restricted-user denial, lock timeout, changed evidence, bounded serialization-failure rollback and same-artifact reinstall passed separately. Concurrent first-execution testing remains incomplete. |
 | Source package | Application classes, configuration and these instructions. Graphical rehearsal and runtime evidence remain local. |
 
 The contest accepts Builds 109 and 154. Build 154 is the observed application qualification target. Portal availability of that exact Community archive is an operator prerequisite, and accepting another contest build does not establish its application compatibility. Qualification remains attached to the recorded fixture and source snapshots. These documentation instructions require a fresh installation run for a new environment.

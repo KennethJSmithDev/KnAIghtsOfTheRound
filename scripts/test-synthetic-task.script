@@ -1,0 +1,122 @@
+// Run once in an owned fresh test namespace after compiling SyntheticTask and starting
+// the existing KnAIghts production. This test appends three synthetic audit entries,
+// then updates one mock task. It performs no inference and leaves all audit rows intact.
+// Require KNAIGHTS_SYNTHETIC_TASK_OK and reject runtime errors or any FAIL marker.
+Set $ETRAP="Write !,""KNAIGHTS_SYNTHETIC_TASK_FAIL runtime error"",! Halt"
+If '$SYSTEM.Security.Check("%Admin_Operate", "U") { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL operator privilege",! Halt }
+Set actor = $USERNAME
+Set initial = ##class(KnAIghts.Review.SyntheticTask).Read()
+If initial.%Get("status")'="NOT_FOUND" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL fresh task required",! Halt }
+Merge originalAudits = ^KnAIghtsReviewAudit
+Set sc = ##class(Ens.Director).CreateBusinessService("KnAIghtsEntry", .entry)
+If $SYSTEM.Status.IsError(sc) { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL service creation",! Halt }
+Set citations = ["ImagingStudy/example-ct","ImagingSelection/example-segment"]
+
+// Create the invalid-case control and two independent review evidence revisions through
+// the same trusted internal service path used by test-synthetic.script.
+Set request = ##class(KnAIghts.Review.Request).%New()
+Set request.CaseId = "synthetic-a", request.CodexPrincipal = "knaights_codex"
+Set proposal = {"action":"SHOW_VERIFIED"}
+Do proposal.%Set("citations", citations)
+Set request.CodexProposal = proposal.%ToJSON()
+Set sc = entry.ProcessInput(request, .response, .hint)
+If $SYSTEM.Status.IsError(sc) { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL control service status",! Halt }
+If response.Status'="ACCEPTED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL control disposition",! Halt }
+Set controlId = response.AuditId
+Set request.CaseId = "synthetic-b", proposal = {"action":"REQUEST_REVIEW"}
+Do proposal.%Set("citations", citations)
+Set request.CodexProposal = proposal.%ToJSON()
+Set sc = entry.ProcessInput(request, .response, .hint)
+If $SYSTEM.Status.IsError(sc) { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL first evidence service status",! Halt }
+If response.Status'="REVIEW_REQUESTED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL first evidence disposition",! Halt }
+Set firstId = response.AuditId
+Set sc = entry.ProcessInput(request, .response, .hint)
+If $SYSTEM.Status.IsError(sc) { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL second evidence service status",! Halt }
+If response.Status'="REVIEW_REQUESTED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL second evidence disposition",! Halt }
+Set secondId = response.AuditId
+If firstId=secondId { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL distinct evidence revisions",! Halt }
+Merge sourceAudits = ^KnAIghtsReviewAudit
+
+Set result = ##class(KnAIghts.Review.SyntheticTask).Propose(controlId, 0)
+If result.%Get("status")'="INVALID_EVIDENCE" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL wrong case admitted",! Halt }
+If $Data(^KnAIghtsReviewAudit(2147483646)) { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL missing control already exists",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Propose(2147483646, 0)
+If result.%Get("status")'="EVIDENCE_UNAVAILABLE" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL missing evidence admitted",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Read()
+If result.%Get("status")'="NOT_FOUND" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL rejected proposal created task",! Halt }
+
+Set result = ##class(KnAIghts.Review.SyntheticTask).Propose(firstId, 0)
+If result.%Get("status")'="PROPOSED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL proposal",! Halt }
+Set task = result.%Get("task")
+If task.%Get("revision")'=1 { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL proposal revision",! Halt }
+If task.%Get("evidenceRevision")'=1 { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL proposal evidence revision",! Halt }
+If task.%Get("proposedBy")'=actor { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL proposal identity",! Halt }
+Set stable = result.%Get("task").%ToJSON()
+Set result = ##class(KnAIghts.Review.SyntheticTask).Execute("before-approval", 1, 1)
+If result.%Get("status")'="APPROVAL_REQUIRED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL unapproved execution",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Execute("", 1, 1)
+If result.%Get("status")'="INVALID_OPERATION_ID" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL empty operation",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Execute("../invalid", 1, 1)
+If result.%Get("status")'="INVALID_OPERATION_ID" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL malformed operation",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Approve(-1, 1)
+If result.%Get("status")'="INVALID_REVISION" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL malformed revision",! Halt }
+TStart
+Set result = ##class(KnAIghts.Review.SyntheticTask).Approve(1, 1)
+If result.%Get("status")'="AMBIENT_TRANSACTION_REJECTED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL ambient transaction",! Halt }
+If $TLevel'=1 { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL caller transaction changed",! Halt }
+TRollback 1
+Set result = ##class(KnAIghts.Review.SyntheticTask).Read()
+If result.%Get("task").%ToJSON()'=stable { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL denied transition mutated task",! Halt }
+
+Set result = ##class(KnAIghts.Review.SyntheticTask).Approve(1, 1)
+If result.%Get("status")'="APPROVED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL first approval",! Halt }
+Set task = result.%Get("task"), approval = task.%Get("approval")
+If approval.%Get("approvedBy")'=actor { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL actual approver identity",! Halt }
+Set firstApproval = approval.%Get("approvalId")
+If firstApproval="" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL approval identity",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).ReviseEvidence(secondId, 2)
+If result.%Get("status")'="EVIDENCE_REVISED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL evidence revision",! Halt }
+Set task = result.%Get("task")
+If task.%Get("revision")'=3 { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL revised task revision",! Halt }
+If task.%Get("evidenceRevision")'=2 { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL revised evidence revision",! Halt }
+Set stable = task.%ToJSON()
+Set result = ##class(KnAIghts.Review.SyntheticTask).Execute("stale-approval", 2, 1)
+If result.%Get("status")'="STALE_APPROVAL" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL stale approval accepted",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Read()
+If result.%Get("task").%ToJSON()'=stable { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL stale execution mutated task",! Halt }
+
+Set result = ##class(KnAIghts.Review.SyntheticTask).Approve(3, 2)
+If result.%Get("status")'="APPROVED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL current approval",! Halt }
+Set approval = result.%Get("task").%Get("approval")
+If approval.%Get("approvalId")=firstApproval { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL approval identity reused",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Execute("task-exec-001", 4, 2)
+If result.%Get("status")'="EXECUTED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL execution",! Halt }
+Set task = result.%Get("task"), receipt = result.%Get("receipt")
+If task.%Get("status")'="REVIEWED" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL mock task effect",! Halt }
+If task.%Get("revision")'=5 { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL effect revision",! Halt }
+If receipt.%Get("executedBy")'=actor { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL execution identity",! Halt }
+If receipt.%Get("approvalId")'=approval.%Get("approvalId") { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL execution approval binding",! Halt }
+Set stable = task.%ToJSON(), retainedReceipt = receipt.%ToJSON()
+Set result = ##class(KnAIghts.Review.SyntheticTask).Execute("task-exec-001", 4, 2)
+If result.%Get("status")'="DUPLICATE_EXECUTION" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL duplicate execution accepted",! Halt }
+If result.%Get("receipt").%ToJSON()'=retainedReceipt { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL lost response reconciliation",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Execute("task-exec-001", 5, 2)
+If result.%Get("status")'="DUPLICATE_EXECUTION" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL duplicate current revision accepted",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Execute("different-operation", 5, 2)
+If result.%Get("status")'="TASK_COMPLETE" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL second effect accepted",! Halt }
+Set result = ##class(KnAIghts.Review.SyntheticTask).Read()
+If result.%Get("task").%ToJSON()'=stable { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL duplicate mutated task",! Halt }
+If ^KnAIghtsSyntheticTask("history",0)'["OPEN" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL initial state history",! Halt }
+If $Order(^KnAIghtsSyntheticTask("history",5))'="" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL extra transition",! Halt }
+If $Order(^KnAIghtsSyntheticTask("operations",""))'="task-exec-001" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL missing operation receipt",! Halt }
+If $Order(^KnAIghtsSyntheticTask("operations","task-exec-001"))'="" { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL extra operation receipt",! Halt }
+
+// Existing and newly appended review audits are read-only throughout the task workflow.
+If $Get(^KnAIghtsReviewAudit)'=$Get(sourceAudits) { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL audit counter changed",! Halt }
+Set id = ""
+For { Set id=$Order(sourceAudits(id)) Quit:id=""  If $Get(^KnAIghtsReviewAudit(id))'=sourceAudits(id) { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL audit row changed",! Halt } }
+Set id = ""
+For { Set id=$Order(originalAudits(id)) Quit:id=""  If $Get(^KnAIghtsReviewAudit(id))'=originalAudits(id) { Write "KNAIGHTS_SYNTHETIC_TASK_FAIL original audit row changed",! Halt } }
+Write "KNAIGHTS_SYNTHETIC_TASK_RESULT ",result.%ToJSON(),!
+Write "KNAIGHTS_SYNTHETIC_TASK_OK",!
+Halt

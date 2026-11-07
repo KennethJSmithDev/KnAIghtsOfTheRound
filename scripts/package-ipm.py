@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 
 REVIEW_CLASSES = (
     "App", "Cases", "CodexMCP", "CodexPolicy", "CodexTools", "Operation",
-    "Production", "Request", "Response", "Service", "Tools",
+    "Production", "Request", "Response", "Service", "SyntheticTask", "Tools",
 )
 
 parser = argparse.ArgumentParser(description=__doc__)
