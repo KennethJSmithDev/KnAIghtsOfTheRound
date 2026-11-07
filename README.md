@@ -1,12 +1,42 @@
-# KnAIghts of The Round
+# ⚔️ KnAIghts of The Round
 
-A standalone InterSystems IRIS application for governed evidence review, version **0.1.0 candidate**. An agent reads an authorized evidence projection and proposes a decision. IRIS validates its citations and source binding, returns a typed disposition, and records the result through an Interoperability production.
+**Governed AI agents. Verifiable decisions. One Round Table.**
 
-## Build the application
+## What is KnAIghts of The Round?
 
-The qualified runtime is **IRIS for Health AI Hub Community 2026.3.0AI.154.0, Linux x64**. The contest also accepts Build 109. This application's retained qualification used Build 154. Availability of that exact archive in the [InterSystems Early Access portal](https://evaluation.intersystems.com/Eval/early-access/AIHub) must be checked with the operator's account.
+KnAIghts is an open-source InterSystems IRIS-based platform for coordinating AI-assisted workflows where evidence, authorization, and accountability matter. Agents contribute proposals supported by source references. IRIS validates those proposals, enforces the workflow, and records each disposition.
 
-Obtain the vendor Community archive separately. Load it and give the loaded image a local alias. Replace the placeholder with the exact tag or image ID printed by `docker image load`.
+**The agents contribute intelligence. IRIS remains the authority.**
+
+## Features
+
+- Agent-assisted review of authorized evidence.
+- Exact citation and source-binding validation before a selection is returned.
+- Governed decisions to show verified evidence or request review.
+- Typed requests and responses through an InterSystems Interoperability production.
+- Auditable dispositions that can be checked against message records.
+- An authenticated Codex MCP seat and a native AI Hub agent route.
+
+## How it works
+
+```text
+Authorized evidence → Agent proposal → IRIS validation → Decision + audit record
+```
+
+Both demonstration cases use the same `KnAIghtsEntry → AssessEvidence` production route. The agent chooses an action and cites its evidence. IRIS checks the exact ordered references and source agreement, then returns a typed result with an explanation, limitation, and audit ID.
+
+Clients can build on this shared review boundary. DICOM3D is the first planned domain adapter. Dashboards and an immersive Round Table interface are planned.
+
+## Getting started
+
+```powershell
+git clone https://github.com/KennethJSmithDev/KnAIghtsOfTheRound.git
+cd KnAIghtsOfTheRound
+```
+
+The demonstrated runtime is **IRIS for Health AI Hub Community 2026.3.0AI.154.0, Linux x64**, with Docker and Docker Compose. Obtain the Community archive through the [InterSystems Early Access portal](https://evaluation.intersystems.com/Eval/early-access/AIHub). Availability of that exact archive requires confirmation with your portal account.
+
+Load the archive and assign a local alias. Replace the placeholder with the exact image tag or ID printed by `docker image load`.
 
 ```powershell
 docker image load -i irishealth-community-2026.3.0AI.154.0-docker.tar.gz
@@ -15,66 +45,53 @@ $env:KNAIGHTS_IRIS_IMAGE = "knaights-iris:build154"
 docker compose build
 ```
 
-The application image defaults to `knaights-of-the-round:dev`. `KNAIGHTS_IRIS_IMAGE` selects the vendor base, and `KNAIGHTS_APP_IMAGE` selects the application image tag. Startup preloads the tool authorization class before the remaining classes compile. See the [secure fixture and Codex seat instructions](docs/INTEROPERABILITY.md#codex-seat-setup) to start the synthetic demonstration with fresh credentials.
+For package-manager installation, see the [IPM guide](docs/INTEROPERABILITY.md#ipm-installation).
 
-The source package supplies application classes and Docker configuration. Obtain the vendor image, Codex client, account access, and any optional inference provider separately.
+Follow the [secure fixture and Codex seat setup](docs/INTEROPERABILITY.md#codex-seat-setup) to start the application with fresh credentials and connect the two synthetic MCP tools. Use your supported ChatGPT sign-in in Codex. The source supplies the application and container configuration. The IRIS image, client access, and model runtime are separately supplied.
 
-## Run the synthetic demonstration
-
-The two Codex tools are `ReadSyntheticEvidence` and `SubmitSyntheticDecision`. Both assigned cases traverse the same production route.
-
-`KnAIghtsEntry -> AssessEvidence -> validated disposition -> audit record`
-
-Ask the configured Codex seat:
-
-> Review synthetic-a and synthetic-b. For each case, first call ReadSyntheticEvidence. Compare the source identities in the returned evidence. Choose SHOW_VERIFIED when they agree, or REQUEST_REVIEW when they disagree or remain uncertain. Call SubmitSyntheticDecision with the caseId and a proposal string containing a JSON object with exactly action and citations. Copy evidenceRefs exactly and in order. Report the returned status and audit ID.
-
-Expected outcomes are `ACCEPTED` for `synthetic-a` and `REVIEW_REQUESTED` for `synthetic-b`. The service derives the explanation and selection from validated facts. Verify responses against the persisted audit rows using the [independent check](docs/INTEROPERABILITY.md#verify-the-demonstration). The review disposition is a local audit record. Human worklist delivery is a separate integration.
-
-The Codex seat uses the operator's supported ChatGPT sign-in and a restricted IRIS principal. It works with application inference disabled. A graphical rehearsal remains a local artifact. This source package's demonstration uses the Codex tools and the IRIS production.
-
-The source also includes a deterministic proposal-validation regression. With the application classes compiled under the base Compose profile, feed it to an owned IRIS session and require its pass marker. This regression submits trusted internal proposals through the production service and appends four audit records.
-
-```powershell
-Get-Content -Raw scripts/test-synthetic.script |
-  docker compose exec -T iris iris session IRIS -U USER |
-  Tee-Object -FilePath .local/synthetic-test.log
-Select-String -Path .local/synthetic-test.log -Pattern '^KNAIGHTS_SYNTHETIC_OK$'
-```
-
-Create `.local` before saving the log. For the separately named secure Codex fixture, substitute `docker exec --user 51773 -i knaights-codex-demo iris session IRIS -U USER`. The deterministic regression checks proposal validation through the production. Authentication and actual agent decisions have their own witnesses.
-
-## Optional native agent provider
-
-The native `%AI.Agent` route targets the existing `gpt-oss:20b` model on an operator-configured OpenAI-compatible endpoint. Copy `.env.example` to `.env`, set `KNAIGHTS_PROVIDER_BASE_URL`, and create the private `.local` directory before using `compose.live.yaml`. The admitted URL shapes are `http://127.0.0.1:<port>/v1`, `http://host.docker.internal:<port>/v1`, and `http://knights-provider:<port>/v1`. Container loopback refers to the container itself. Host connectivity and actual network routes need verification on the installation.
-
-`compose.live.yaml` sets `KNAIGHTS_LIVE=1`, requires the provider URL, mounts `.local` read-only, and enables network routing. Its network can reach destinations beyond the provider. It starts only the application. See the [native route scope](docs/INTEROPERABILITY.md#optional-native-agent-route) before enabling it.
-
-After configuring the endpoint and confirming capacity for the runtime and model, start the optional profile and submit both synthetic cases. The native route passed the bounded local qualification described below. These commands use your configured provider and network.
+For the native agent route, provide the existing local `gpt-oss:20b` model through an authorized OpenAI-compatible endpoint. Copy `.env.example` to `.env`, set `KNAIGHTS_PROVIDER_BASE_URL`, and create `.local` before starting the optional profile.
 
 ```powershell
 docker compose -f compose.yaml -f compose.live.yaml up --build -d
-@'
-Set sc=##class(KnAIghts.Review.App).Submit("synthetic-a",.response)
-If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
-Write !,response.ToJSON(),!
-Set sc=##class(KnAIghts.Review.App).Submit("synthetic-b",.response)
-If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
-Write !,response.ToJSON(),!
-Halt
-'@ | docker compose -f compose.yaml -f compose.live.yaml exec -T iris iris session IRIS -U USER
 ```
 
-## License and attribution
+The configured provider must be reachable from the container. The live override enables outbound network routing. Review the [native agent configuration](docs/INTEROPERABILITY.md#optional-native-agent-route) for endpoint admission, resource requirements, and verification.
 
-Application licensing is recorded in [LICENSE](LICENSE), with component acknowledgments and separate vendor, client, and model terms in [NOTICE](NOTICE). Preserve both files when redistributing this source package.
+## Example workflow
 
-## Qualification scope
+Ask the configured Codex seat to review both synthetic cases:
 
-The retained local Community Build 154 witness exercised the authenticated Codex MCP seat on both synthetic cases through one Interoperability production. Independent message and audit checks matched the responses. Negative checks rejected wrong credentials, an unauthorized case, and an unsupported selection for mismatched evidence.
+> Review synthetic-a and synthetic-b. For each case, first call ReadSyntheticEvidence. Compare the returned source identities. Choose SHOW_VERIFIED when they agree, or REQUEST_REVIEW when they disagree or remain uncertain. Call SubmitSyntheticDecision with the caseId and a proposal string containing a JSON object with exactly action and citations. Copy evidenceRefs exactly and in order. Report the returned status and audit ID.
 
-On November 7, the candidate Docker image compiled and started in a fresh isolated Build 154 fixture. Two actual native `%AI.Agent` submissions to the existing local `gpt-oss:20b` made four provider completions and each invoked `ReadEvidence`. The matching case returned `ACCEPTED` / `SHOW_VERIFIED`, and the mismatched case returned `REVIEW_REQUESTED` / `REQUEST_REVIEW`. Independent IRIS message and audit readback matched both responses. The deterministic rejection regression also passed. The owned production and model processes were stopped afterward.
+| Case | Expected disposition |
+|---|---|
+| `synthetic-a` | `ACCEPTED` / `SHOW_VERIFIED` |
+| `synthetic-b` | `REVIEW_REQUESTED` / `REQUEST_REVIEW` |
 
-The native witness used an internal network and an owned local relay. The generic live Compose network and a fresh third-party installation retain separate qualification boundaries. The tested image has no IPM package manager, so IPM installation and registry publication remain pending. Build 109 compatibility is unverified. Details are in [Interoperability](docs/INTEROPERABILITY.md).
+The native AI Hub agent reviews the same cases through `KnAIghts.Review.App.Submit()`. See the [native agent example](docs/INTEROPERABILITY.md#optional-native-agent-route) for the complete commands.
 
-Domain applications such as DICOM3D can be integrated through separately authorized source and display contracts. This package demonstrates the shared review boundary with synthetic evidence.
+Use the [independent verification instructions](docs/INTEROPERABILITY.md#verify-the-demonstration) to compare returned audit IDs and responses against stored dispositions and Interoperability messages.
+
+## Current development status
+
+**Version 0.1.0 candidate.** Native AI Hub and authenticated Codex MCP workflows have been demonstrated locally on Community Build 154 for the two synthetic cases, with independent audit and message checks. Citation rejection and source-mismatch controls have also been exercised.
+
+The native route currently supports the existing local `gpt-oss:20b` configuration. The contest accepts Builds 109 and 154, while application compatibility on Build 109 remains unverified. Local IPM installation, restart, uninstall, and same-package reinstall are tested. Registry publication remains pending. Detailed scope is recorded in [Interoperability](docs/INTEROPERABILITY.md#qualification-evidence).
+
+This is an early development application for demonstration and testing. Restrict ingress to trusted, configured interfaces. Trusted internal callers can construct principal attribution, and audit records represent individual attempts. Human review currently produces an auditable disposition. Durable reviewer delivery is planned.
+
+## Roadmap
+
+- Evidence-bound approval and synthetic execution that reject stale approvals and duplicate effects.
+- Reusable workflows and shared session context.
+- A dashboard, Round Table interface, and Book of Receipts.
+- Additional model and tool seats with declared capabilities and permissions.
+- Domain adapters and source-linked visualization, beginning with DICOM3D.
+- Human review assignment and delivery.
+- Deployment profiles and broader runtime compatibility.
+
+## Contributing, license, and acknowledgments
+
+Contributions through issues, testing, documentation, and focused changes are welcome. Describe the intended behavior and evidence needed to verify a change.
+
+KnAIghts is licensed under the [Apache License 2.0](LICENSE). The review production pattern is adapted from DICOM3D. Preserve the attribution in [NOTICE](NOTICE). InterSystems IRIS for Health, client software, and model runtimes are separately supplied under their respective terms.

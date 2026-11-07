@@ -56,6 +56,59 @@ enabled_tools = ["mcp_knaights-codex_ReadSyntheticEvidence", "mcp_knaights-codex
 
 Use the operator's supported ChatGPT sign-in in Codex. Inspect the discovered tools and authorize the two synthetic tools for the requested demonstration. The qualified run used a scoped client configuration with only these tools. Server policy accepts `synthetic-a` and `synthetic-b`. The container publishes zero host ports. [IRIS container documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=ADOCK)
 
+## IPM installation
+
+The package lifecycle is tested with IPM 0.10.9 on AI Hub Community Build 154. Use a dedicated interoperability-enabled namespace. Production start and stop remain explicit. The package does not provision the optional MCP account.
+
+If the instance lacks IPM, download the pinned client installer from the official registry and verify its hash before importing.
+
+```powershell
+New-Item -ItemType Directory -Force .local | Out-Null
+Invoke-WebRequest https://pm.community.intersystems.com/packages/zpm/0.10.9/installer -OutFile .local/ipm-0.10.9-installer.xml
+(Get-FileHash .local/ipm-0.10.9-installer.xml -Algorithm SHA256).Hash
+```
+
+The tested installer SHA-256 is `65d52082aace513daa1ecf30fb04b7d1b198530cb1d4ee59b688dbadaf0dd00f`. Copy it into your isolated container as `/tmp/ipm-installer.xml`, then run the following in the target IRIS namespace with installation privileges:
+
+```objectscript
+Set sc=$SYSTEM.OBJ.Load("/tmp/ipm-installer.xml","ck")
+Do $SYSTEM.Status.DisplayError(sc)
+```
+
+Build an application archive from a clean checkout using Python 3.9 or later. The builder includes the exact application source, module descriptor, LICENSE and NOTICE, and preserves existing output files.
+
+```powershell
+python scripts/package-ipm.py .local/knaights-of-the-round-0.1.0.tgz
+```
+
+Copy the archive into the owned container as `/tmp/knaights-of-the-round-0.1.0.tgz`. In the target namespace:
+
+```objectscript
+Set sc=##class(%IPM.Main).ShellScript("load /tmp/knaights-of-the-round-0.1.0.tgz -v")
+Do $SYSTEM.Status.DisplayError(sc)
+```
+
+Require a successful status and verify `zpm "list"` reports `knaights-of-the-round` version `0.1.0`. The manifest precompiles the authorization class before its tool set. Start the production explicitly:
+
+```objectscript
+Set sc=##class(KnAIghts.Review.App).Start()
+Do $SYSTEM.Status.DisplayError(sc)
+Write ##class(KnAIghts.Review.App).Status().%ToJSON()
+```
+
+Run `scripts/test-synthetic.script` and independently check its responses against the audit records. For source development, IPM also accepts `load /path/to/clean-checkout -v`. After a container restart, start the production explicitly again.
+
+Before uninstalling, stop the owned KnAIghts production. Confirm it is the active production in your dedicated namespace before calling the stop method.
+
+```objectscript
+Set sc=##class(Ens.Director).StopProduction(30,0)
+Do $SYSTEM.Status.DisplayError(sc)
+Set sc=##class(%IPM.Main).ShellScript("uninstall knaights-of-the-round -v")
+Do $SYSTEM.Status.DisplayError(sc)
+```
+
+Uninstall removes package classes and registration. Synthetic audit records remain for review. Reinstall using the same archive and start explicitly as above. Registry publication is a separate maintainer action. See the [official IPM installation guide](https://github.com/intersystems/ipm) and [manifest lifecycle reference](https://github.com/intersystems/ipm/wiki/03.-IPM-Manifest-(module.xml)).
+
 ## Verify the demonstration
 
 Run the prompt in the README. Compare the returned audit IDs and response JSON against an independent IRIS session.
@@ -90,6 +143,21 @@ docker stop -t 50 knaights-codex-demo
 
 An operator enabling the native route must provide the endpoint and verify provider reachability, available memory, actual egress, tool calls, response validation, and persisted audit outcomes. An earlier standalone attempt stopped before inference because memory admission failed. A fresh November 7 run completed both native cases with the candidate image, an internal network, and an owned local relay. Each agent invoked ReadEvidence and returned a final decision. The generic live Compose network remains a separately configured path.
 
+The native agent accepts the same cases through the application entry point:
+
+```powershell
+@'
+Set sc=##class(KnAIghts.Review.App).Submit("synthetic-a",.response)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,response.ToJSON(),!
+Set sc=##class(KnAIghts.Review.App).Submit("synthetic-b",.response)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,response.ToJSON(),!
+Halt
+'@ | docker compose -f compose.yaml -f compose.live.yaml exec -T iris iris session IRIS -U USER
+```
+
+
 ## Qualification evidence
 
 The public source includes this scope summary. Exact logs, credentials, transcripts, receipts, and graphical rehearsal assets remain in their owned local evidence store.
@@ -101,9 +169,9 @@ The public source includes this scope summary. Exact logs, credentials, transcri
 | Negative authorization and proposal controls | Wrong credentials and an unauthorized case were denied. A forced selection against mismatched evidence was rejected. |
 | Standalone native model route, November 7 | PASS in a fresh isolated candidate fixture. Two `%AI.Agent` submissions, four provider completions, one ReadEvidence tool call per case, accepted matching selection and mismatch review. Independent persisted audit and two message-route sessions matched. Graceful production/container stop, exit 0, no OOM. |
 | Deterministic trusted-proposal regression, November 7 | PASS for matching selection, mismatch review, forced selection rejection, unsupported citation rejection, H000 admission denial and exact audit readback. |
-| IPM and other builds | Candidate manifest has the required system declaration. The tested image lacks IPM. Installation, upgrade, uninstall and registry publication remain pending. Build 109 compatibility is unverified. |
+| IPM installation | PASS with client 0.10.9 on Build 154 for source load, exact-source TGZ installation, explicit production start, synthetic tests and audit readback, restart persistence, uninstall and same-artifact reinstall. Registry publication remains pending. Build 109 compatibility is unverified. |
 | Source package | Application classes, configuration and these instructions. Graphical rehearsal and runtime evidence remain local. |
 
 The contest accepts Builds 109 and 154. Build 154 is the observed application qualification target. Portal availability of that exact Community archive is an operator prerequisite, and accepting another contest build does not establish its application compatibility. Qualification remains attached to the recorded fixture and source snapshots. These documentation instructions require a fresh installation run for a new environment.
 
-The November 7 source snapshot matched all eleven published Review class blobs after LF normalization. The isolated run stayed within two agent submissions and six allowed provider completions, used zero browsers, and retained its stopped fixture and private evidence. Minimum observed free RAM was 24.538 GiB and commit headroom was 21.56 GiB. The earlier authenticated MCP witness remains separately scoped. Direct trusted message callers can construct principal attribution, and audit rows record attempts rather than idempotent operations. Keep ingress restricted to the owned application.
+The native agent and authenticated MCP integrations have separate test coverage. Direct trusted message callers can construct principal attribution, and audit rows record attempts rather than idempotent operations. Keep ingress restricted to the owned application.

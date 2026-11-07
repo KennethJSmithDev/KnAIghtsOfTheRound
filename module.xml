@@ -8,6 +8,14 @@
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="KnAIghts.PKG"/>
+      <!-- Build 154 generates the tool policy getter during compilation.
+           Compile its authorization class first after IPM has loaded source.
+           The compiler invocation requires the bare class name.
+           Keep this aligned with docker/bootstrap.script and test clean installs. -->
+      <Invoke Class="%SYSTEM.OBJ" Method="Compile" Phase="Compile" When="Before" CheckStatus="true">
+        <Arg>KnAIghts.Review.CodexPolicy</Arg>
+        <Arg>ck</Arg>
+      </Invoke>
       <SystemRequirements Version="&gt;=2026.3" Interoperability="enabled"/>
     </Module>
   </Document>
