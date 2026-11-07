@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+  <Document name="knaights-of-the-round.ZPM">
+    <Module>
+      <Name>knaights-of-the-round</Name>
+      <Version>0.1.0</Version>
+      <Description>Governed evidence review with InterSystems IRIS Interoperability and AI Hub</Description>
+      <Packaging>module</Packaging>
+      <SourcesRoot>src</SourcesRoot>
+      <Resource Name="KnAIghts.PKG"/>
+      <SystemRequirements Version="&gt;=2026.3" Interoperability="enabled"/>
+    </Module>
+  </Document>
+</Export>

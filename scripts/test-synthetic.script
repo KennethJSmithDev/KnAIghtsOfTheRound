@@ -1,0 +1,88 @@
+// Deterministic proposal-validation regression for an owned, isolated test namespace.
+// Run after the KnAIghts classes have compiled and the production is running.
+// Trusted internal requests follow the existing service and operation route.
+// Authentication, MCP and native inference retain separate tests. Four audits are appended.
+// Require KNAIGHTS_SYNTHETIC_OK in the captured output. IRIS Halt alone can exit zero.
+
+Set $ETRAP="Write !,""KNAIGHTS_SYNTHETIC_FAIL runtime error"",! Halt"
+Set sc = ##class(Ens.Director).CreateBusinessService("KnAIghtsEntry", .entry)
+If $SYSTEM.Status.IsError(sc) { Write "KNAIGHTS_SYNTHETIC_FAIL service creation",! Halt }
+Set citations = ["ImagingStudy/example-ct","ImagingSelection/example-segment"]
+
+// The public candidate admits only synthetic cases, independently of live configuration.
+Set denied = ##class(KnAIghts.Review.Cases).Resolve("h000")
+If denied.%Get("error")'="CASE_NOT_ALLOWED" { Write "KNAIGHTS_SYNTHETIC_FAIL H000 admission",! Halt }
+Write "KNAIGHTS_SYNTHETIC_RESULT H000-denied",!
+
+// Matching source accepts the proposed selection and preserves exact citations.
+Set request = ##class(KnAIghts.Review.Request).%New()
+Set request.CaseId = "synthetic-a", request.CodexPrincipal = "knaights_codex"
+Set proposal = {"action":"SHOW_VERIFIED"}
+Do proposal.%Set("citations", citations)
+Set request.CodexProposal = proposal.%ToJSON()
+Set sc = entry.ProcessInput(request, .response, .hint)
+If $SYSTEM.Status.IsError(sc) { Write "KNAIGHTS_SYNTHETIC_FAIL accepted status",! Halt }
+If response.Status'="ACCEPTED" { Write "KNAIGHTS_SYNTHETIC_FAIL accepted disposition",! Halt }
+If response.Action'="SHOW_VERIFIED" { Write "KNAIGHTS_SYNTHETIC_FAIL accepted action",! Halt }
+If response.SemanticId'="synthetic.structure.001" { Write "KNAIGHTS_SYNTHETIC_FAIL accepted semantic identity",! Halt }
+If response.Citations'=citations.%ToJSON() { Write "KNAIGHTS_SYNTHETIC_FAIL accepted citations",! Halt }
+If response.Limitation'="Synthetic example for workflow education." { Write "KNAIGHTS_SYNTHETIC_FAIL accepted limitation",! Halt }
+If response.CaseId'="synthetic-a" { Write "KNAIGHTS_SYNTHETIC_FAIL accepted case identity",! Halt }
+If response.CodexPrincipal'="knaights_codex" { Write "KNAIGHTS_SYNTHETIC_FAIL accepted principal",! Halt }
+If response.AuditId<1 { Write "KNAIGHTS_SYNTHETIC_FAIL accepted audit identifier",! Halt }
+If $Get(^KnAIghtsReviewAudit(response.AuditId))'=response.ToJSON() { Write "KNAIGHTS_SYNTHETIC_FAIL accepted audit readback",! Halt }
+Write "KNAIGHTS_SYNTHETIC_RESULT accepted ",response.ToJSON(),!
+
+// A source mismatch accepts a review request and returns no semantic selection.
+Set request = ##class(KnAIghts.Review.Request).%New()
+Set request.CaseId = "synthetic-b", request.CodexPrincipal = "knaights_codex"
+Set proposal = {"action":"REQUEST_REVIEW"}
+Do proposal.%Set("citations", citations)
+Set request.CodexProposal = proposal.%ToJSON()
+Set sc = entry.ProcessInput(request, .response, .hint)
+If $SYSTEM.Status.IsError(sc) { Write "KNAIGHTS_SYNTHETIC_FAIL review status",! Halt }
+If response.Status'="REVIEW_REQUESTED" { Write "KNAIGHTS_SYNTHETIC_FAIL review disposition",! Halt }
+If response.Action'="REQUEST_REVIEW" { Write "KNAIGHTS_SYNTHETIC_FAIL review action",! Halt }
+If response.SemanticId'="" { Write "KNAIGHTS_SYNTHETIC_FAIL review created selection",! Halt }
+If response.Citations'=citations.%ToJSON() { Write "KNAIGHTS_SYNTHETIC_FAIL review citations",! Halt }
+If response.Limitation'="Synthetic example for workflow education." { Write "KNAIGHTS_SYNTHETIC_FAIL review limitation",! Halt }
+If response.CaseId'="synthetic-b" { Write "KNAIGHTS_SYNTHETIC_FAIL review case identity",! Halt }
+If response.AuditId<1 { Write "KNAIGHTS_SYNTHETIC_FAIL review audit identifier",! Halt }
+If $Get(^KnAIghtsReviewAudit(response.AuditId))'=response.ToJSON() { Write "KNAIGHTS_SYNTHETIC_FAIL review audit readback",! Halt }
+Write "KNAIGHTS_SYNTHETIC_RESULT review ",response.ToJSON(),!
+
+// Exact valid citations cannot authorize a selection against mismatched sources.
+Set request = ##class(KnAIghts.Review.Request).%New()
+Set request.CaseId = "synthetic-b", request.CodexPrincipal = "knaights_codex"
+Set proposal = {"action":"SHOW_VERIFIED"}
+Do proposal.%Set("citations", citations)
+Set request.CodexProposal = proposal.%ToJSON()
+Set sc = entry.ProcessInput(request, .response, .hint)
+If $SYSTEM.Status.IsError(sc) { Write "KNAIGHTS_SYNTHETIC_FAIL forced selection status",! Halt }
+If response.Status'="REJECTED_PROPOSAL" { Write "KNAIGHTS_SYNTHETIC_FAIL forced selection disposition",! Halt }
+If response.Action'="" { Write "KNAIGHTS_SYNTHETIC_FAIL forced selection action",! Halt }
+If response.SemanticId'="" { Write "KNAIGHTS_SYNTHETIC_FAIL forced selection identity",! Halt }
+If response.Citations'="[]" { Write "KNAIGHTS_SYNTHETIC_FAIL forced selection citations",! Halt }
+If response.CaseId'="synthetic-b" { Write "KNAIGHTS_SYNTHETIC_FAIL forced selection case",! Halt }
+If response.AuditId<1 { Write "KNAIGHTS_SYNTHETIC_FAIL forced selection audit identifier",! Halt }
+If $Get(^KnAIghtsReviewAudit(response.AuditId))'=response.ToJSON() { Write "KNAIGHTS_SYNTHETIC_FAIL forced selection audit readback",! Halt }
+Write "KNAIGHTS_SYNTHETIC_RESULT forced-selection-rejected ",response.ToJSON(),!
+
+// Matching sources cannot authorize a proposal citing a different source selection.
+Set request = ##class(KnAIghts.Review.Request).%New()
+Set request.CaseId = "synthetic-a", request.CodexPrincipal = "knaights_codex"
+Set proposal = {"action":"SHOW_VERIFIED","citations":["ImagingStudy/example-ct","ImagingSelection/unrelated-segment"]}
+Set request.CodexProposal = proposal.%ToJSON()
+Set sc = entry.ProcessInput(request, .response, .hint)
+If $SYSTEM.Status.IsError(sc) { Write "KNAIGHTS_SYNTHETIC_FAIL unsupported citation status",! Halt }
+If response.Status'="REJECTED_PROPOSAL" { Write "KNAIGHTS_SYNTHETIC_FAIL unsupported citation disposition",! Halt }
+If response.Action'="" { Write "KNAIGHTS_SYNTHETIC_FAIL unsupported citation action",! Halt }
+If response.SemanticId'="" { Write "KNAIGHTS_SYNTHETIC_FAIL unsupported citation identity",! Halt }
+If response.Citations'="[]" { Write "KNAIGHTS_SYNTHETIC_FAIL unsupported citation references",! Halt }
+If response.CaseId'="synthetic-a" { Write "KNAIGHTS_SYNTHETIC_FAIL unsupported citation case",! Halt }
+If response.AuditId<1 { Write "KNAIGHTS_SYNTHETIC_FAIL unsupported citation audit identifier",! Halt }
+If $Get(^KnAIghtsReviewAudit(response.AuditId))'=response.ToJSON() { Write "KNAIGHTS_SYNTHETIC_FAIL unsupported citation audit readback",! Halt }
+Write "KNAIGHTS_SYNTHETIC_RESULT unsupported-citation-rejected ",response.ToJSON(),!
+
+Write "KNAIGHTS_SYNTHETIC_OK",!
+Halt

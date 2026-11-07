@@ -1,0 +1,28 @@
+# Local configuration, secrets and qualification outputs
+.env
+.env.*
+!.env.example
+.local/
+.local-*/
+.secrets/
+*.log
+
+# Vendor images, built archives and local imaging
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.vhdx
+*.dcm
+*.dicom
+*.raw16
+*.npy
+*.npz
+*.glb
+*.nii
+*.nii.gz
+merge.cpf
+iris.key
+
+# Retained research adapter awaits independent source-validation qualification.
+src/KnAIghts/DICOM3D/H000Evidence.cls

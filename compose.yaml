@@ -1,0 +1,22 @@
+name: knaights-of-the-round
+
+services:
+  iris:
+    image: ${KNAIGHTS_APP_IMAGE:-knaights-of-the-round:dev}
+    pull_policy: never
+    build:
+      context: .
+      args:
+        IRIS_IMAGE: ${KNAIGHTS_IRIS_IMAGE:-docker.iscinternal.com/docker-intersystems/intersystems/irishealth-community:2026.3.0AI.154.0}
+    command: ["--after", "/opt/knaights/bootstrap.sh"]
+    environment:
+      KNAIGHTS_LIVE: "0"
+    cpus: 2
+    mem_limit: 3g
+    shm_size: 64m
+    stop_grace_period: 60s
+    restart: "no"
+
+networks:
+  default:
+    internal: true

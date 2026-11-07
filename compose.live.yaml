@@ -1,0 +1,21 @@
+# Explicit synthetic inference profile. The provider is configured separately.
+# This override publishes no host ports.
+services:
+  iris:
+    environment:
+      KNAIGHTS_LIVE: "1"
+      KNAIGHTS_PROVIDER_BASE_URL: ${KNAIGHTS_PROVIDER_BASE_URL:?Configure an authorized local provider URL}
+    volumes:
+      - type: bind
+        source: ./.local
+        target: /run/knaights
+        read_only: true
+        bind:
+          create_host_path: false
+
+networks:
+  default:
+    # The live override allows routing to the operator's provider. With internal disabled,
+    # the network can also have outbound reachability. Verify the actual routes
+    # before making a local-only claim.
+    internal: false

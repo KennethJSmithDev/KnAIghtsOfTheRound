@@ -1,0 +1,8 @@
+Set sc=$SYSTEM.OBJ.Load("/opt/knaights/src/KnAIghts/Review/CodexPolicy.cls","ck")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=$SYSTEM.OBJ.LoadDir("/opt/knaights/src","ck",.errors,1)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(KnAIghts.Review.App).Start()
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"KNAIGHTS_BOOTSTRAP_OK",!
+Halt

@@ -1,0 +1,19 @@
+Set sc=##class(Security.Resources).Create("KnAIghtsSeatUse","Authorized synthetic review MCP application","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(Security.Roles).Create("KnAIghtsSeatReader","Restricted synthetic seat","KnAIghtsSeatUse:U,%DB_USER:R,%DB_IRISLIB:R,%DB_ENSLIB:R,%DB_HSLIB:R,%DB_IRISTEMP:RW","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(Security.Roles).Create("KnAIghtsSeatMessage","Message persistence scoped to the MCP application","%DB_USER:RW","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set f=##class(%Stream.FileCharacter).%New(),f.Filename="/run/knaights-codex/seat-password.txt"
+Set p("Roles")="KnAIghtsSeatReader",p("Password")=$ZStrip(f.Read(),"<W"),p("Enabled")=1,p("ChangePassword")=0,p("NameSpace")="USER"
+Set sc=##class(Security.Users).Create("knaights_codex",.p)
+Kill p,f
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set p("NameSpace")="USER",p("DispatchClass")="KnAIghts.Review.CodexMCP",p("Enabled")=1,p("Type")=18,p("AutheEnabled")=32,p("Resource")="KnAIghtsSeatUse",p("MatchRoles")="KnAIghtsSeatReader:KnAIghtsSeatMessage"
+Set sc=##class(Security.Applications).Create("/mcp/knaights-codex",.p)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Kill p
+Set sc=##class(Security.Applications).Get("/mcp/knaights-codex",.p)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+If ($Get(p("Type"))=18),($Get(p("AutheEnabled"))=32),($Get(p("Resource"))="KnAIghtsSeatUse"),($Get(p("MatchRoles"))="KnAIghtsSeatReader:KnAIghtsSeatMessage") { Write !,"CODEX_APP_OK",! }
+Halt

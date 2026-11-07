@@ -1,0 +1,8 @@
+**
+!Dockerfile
+!src/
+!src/**
+!docker/
+!docker/bootstrap.sh
+!docker/bootstrap.script
+src/KnAIghts/DICOM3D/
