@@ -23,7 +23,7 @@ The source package supplies application classes and Docker configuration. Obtain
 
 The two Codex tools are `ReadSyntheticEvidence` and `SubmitSyntheticDecision`. Both assigned cases traverse the same production route.
 
-`KnAIghtsEntry Ã¢â€ â€™ AssessEvidence Ã¢â€ â€™ validated disposition Ã¢â€ â€™ audit record`
+`KnAIghtsEntry -> AssessEvidence -> validated disposition -> audit record`
 
 Ask the configured Codex seat:
 
