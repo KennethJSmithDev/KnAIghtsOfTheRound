@@ -2,6 +2,8 @@
 
 **Governed AI agents. Verifiable decisions. One Round Table.**
 
+<img src="assets/brand/kotr-logo.png" alt="KnAIghts of The Round" width="360">
+
 ## What is KnAIghts of The Round?
 
 KnAIghts is an open-source InterSystems IRIS-based platform for coordinating AI-assisted workflows where evidence, authorization, and accountability matter. Agents contribute proposals supported by source references. IRIS validates those proposals, enforces the workflow, and records each disposition.
@@ -60,6 +62,8 @@ The configured provider must be reachable from the container. The live override 
 
 ## Example workflow
 
+Follow the [judge walkthrough](docs/JUDGE-WALKTHROUGH.md) for a guided demonstration of native agent decisions, source validation, audit verification, and operator-approved task updates.
+
 Ask the configured Codex seat to review both synthetic cases:
 
 > Review synthetic-a and synthetic-b. For each case, first call ReadSyntheticEvidence. Compare the returned source identities. Choose SHOW_VERIFIED when they agree, or REQUEST_REVIEW when they disagree or remain uncertain. Call SubmitSyntheticDecision with the caseId and a proposal string containing a JSON object with exactly action and citations. Copy evidenceRefs exactly and in order. Report the returned status and audit ID.
@@ -93,6 +97,8 @@ The synthetic task API has passed sequential state, permission, evidence-change,
 - Domain adapters and source-linked visualization, beginning with DICOM3D.
 - Human review assignment and delivery.
 - Deployment profiles and broader runtime compatibility.
+
+See the [development tracks](docs/ROADMAP.md) for contest delivery and the post-submission interface work. Maintainers can use the [publication checklist](docs/PUBLICATION.md) for Open Exchange and IPM activation.
 
 ## Contributing, license, and acknowledgments
 

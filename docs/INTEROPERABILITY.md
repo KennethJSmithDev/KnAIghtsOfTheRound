@@ -60,6 +60,8 @@ Use the operator's supported ChatGPT sign-in in Codex. Inspect the discovered to
 
 The package lifecycle is tested with IPM 0.10.9 on AI Hub Community Build 154. Use a dedicated interoperability-enabled namespace. Production start and stop remain explicit. The package does not provision the optional MCP account.
 
+The manifest declares `NOTICE` as an installed file resource, so standard IPM exports retain it alongside `LICENSE`. Its destination is a package-version and namespace-specific directory managed by IPM. Both source-archive and standard-export installation paths have been exercised. Public registry activation is performed through Open Exchange using the [publication checklist](PUBLICATION.md).
+
 If the instance lacks IPM, download the pinned client installer from the official registry and verify its hash before importing.
 
 ```powershell

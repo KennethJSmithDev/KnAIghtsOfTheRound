@@ -8,6 +8,8 @@
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="KnAIghts.PKG"/>
+      <!-- Keep attribution in standard IPM exports and namespace-owned installs. -->
+      <FileCopy Name="NOTICE" Target="${ipmDir}${namespace}/NOTICE"/>
       <!-- Build 154 generates the tool policy getter during compilation.
            Compile its authorization class first after IPM has loaded source.
            The compiler invocation requires the bare class name.
