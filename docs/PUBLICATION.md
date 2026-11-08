@@ -9,7 +9,7 @@ The 2026 AI Agents in Interoperability Workflows contest closes submissions on N
 - Use `assets/brand/kotr-logo.png` as the supplied project artwork.
 - Link the [judge walkthrough](JUDGE-WALKTHROUGH.md), [installation guide](INTEROPERABILITY.md), and [synthetic task guide](SYNTHETIC-TASK.md).
 - Describe the shipped native AI Hub and optional authenticated Codex MCP workflows. Mark the Round Table interface as planned development.
-- State the supported Build 154 image and existing local `gpt-oss:20b` requirement. Build 109 compatibility and concurrent first-execution qualification remain incomplete.
+- State the supported Build 154 image and existing local `gpt-oss:20b` requirement. Other runtime builds and broad concurrency/load behavior remain unqualified; the bounded two-worker duplicate-effect check passed.
 
 ## Submit through Open Exchange
 

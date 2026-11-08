@@ -4,7 +4,7 @@ This walkthrough exercises the native AI Hub agent, the IRIS evidence-validation
 
 ## Prepare the environment
 
-Use a fresh, owned **IRIS for Health AI Hub Community 2026.3.0AI.154.0 Linux x64** instance. Obtain its Community archive through the [InterSystems Early Access portal](https://evaluation.intersystems.com/Eval/early-access/AIHub). Availability of that exact archive requires confirmation with your portal account. The contest accepts Builds 109 and 154, and this application's demonstrated compatibility is Build 154.
+Use a fresh, owned **IRIS for Health AI Hub Community 2026.3.0AI.154.0 Linux x64** instance. Obtain its Community archive through the [InterSystems Early Access portal](https://evaluation.intersystems.com/Eval/early-access/AIHub). Availability of that exact archive requires confirmation with your portal account. This entry targets qualified AI Hub Community Build 154. Organizers also accept Build 109; this application has not been qualified there.
 
 Follow the [README](../README.md#getting-started) and [installation guide](INTEROPERABILITY.md). With the source checkout as the current directory, load and alias the vendor image using the exact image tag or ID reported by Docker.
 
@@ -23,7 +23,7 @@ docker compose -f compose.yaml -f compose.live.yaml up --build -d
 docker compose -f compose.yaml -f compose.live.yaml logs iris
 ```
 
-Require vendor health `healthy` and `KNAIGHTS_BOOTSTRAP_OK`. The live override enables provider routing and can also have outbound reachability. Verify its routes for the installation. The retained native qualification used an internal network and an owned local relay. [IPM installation](INTEROPERABILITY.md#ipm-installation) is an alternative for an owned namespace with IPM 0.10.9. Production startup is explicit with that installation path.
+Require vendor health `healthy` and `KNAIGHTS_BOOTSTRAP_OK`. The live override enables provider routing and can also have outbound reachability. Verify its routes for the installation. The standalone provider path uses stock loopback Ollama through Docker Desktop host routing; see the provider setup in the installation guide. No custom model relay is supplied. [IPM installation](INTEROPERABILITY.md#ipm-installation) is an alternative for an owned namespace with IPM 0.10.9. Production startup is explicit with that installation path.
 
 ## 1. Submit two real native-agent requests
 
@@ -109,11 +109,32 @@ Require `EXECUTED` with task `REVIEWED`, followed by `DUPLICATE_EXECUTION` with 
 
 Use a separate fresh dedicated namespace where `synthetic-review-001` has never been created. A fresh owned application container's `USER` namespace is suitable. Retain the completed native-linked task from step 3. The task API requires the authenticated session's `%Admin_Operate:U` permission.
 
+Create this separate control container from the application image built in **Prepare the environment**. Choose a fresh name if `knaights-task-control-demo` already exists. Docker will refuse to replace an existing container. Do not use the native demonstration container from steps 1–3, whose task must remain preserved. The control container needs no provider or inference.
+
+```powershell
+# Use your matching built application image if you changed KNAIGHTS_APP_IMAGE.
+$taskImage = "knaights-of-the-round:dev"
+docker run -d --pull never --name knaights-task-control-demo --user 51773 --network none --cpus 2 --memory 3g --memory-swap 3g --pids-limit 512 --shm-size 64m --security-opt no-new-privileges:true --env KNAIGHTS_LIVE=0 $taskImage --after /opt/knaights/bootstrap.sh
+if ($LASTEXITCODE -ne 0) { throw "Fresh task control container was not created." }
+$healthDeadline = (Get-Date).AddSeconds(120)
+do {
+  $health = docker inspect --format '{{.State.Health.Status}}' knaights-task-control-demo
+  if ($health -eq "healthy") { break }
+  if ((Get-Date) -ge $healthDeadline) { throw "Task control container did not become healthy." }
+  Start-Sleep -Seconds 1
+} while ($true)
+$startup = docker logs knaights-task-control-demo 2>&1
+if ($LASTEXITCODE -ne 0 -or -not ($startup -match '^KNAIGHTS_BOOTSTRAP_OK$')) {
+  throw "Task control bootstrap did not complete. Preserve and inspect the logs."
+}
+```
+
+
 Run the shipped script once. It creates three synthetic review audit records through the existing service, then demonstrates proposal, operator approval, changed evidence, stale-approval rejection, fresh approval, one update to `REVIEWED`, and duplicate receipt reconciliation. It performs zero model inference. [Synthetic task guide](SYNTHETIC-TASK.md)
 
 ```powershell
 Get-Content -Raw scripts/test-synthetic-task.script |
-  docker compose -f compose.yaml -f compose.live.yaml exec -T iris iris session IRIS -U USER |
+  docker exec --user 51773 -i knaights-task-control-demo iris session IRIS -U USER |
   Tee-Object -FilePath .local/judge-task.log
 Select-String -Path .local/judge-task.log -Pattern '^KNAIGHTS_SYNTHETIC_TASK_OK$'
 ```
@@ -136,8 +157,22 @@ Missing or wrong-case evidence is rejected. Changed bound evidence requires revi
 @'
 Write !,"TASK_READBACK ",##class(KnAIghts.Review.SyntheticTask).Read().%ToJSON(),!
 Halt
-'@ | docker compose -f compose.yaml -f compose.live.yaml exec -T iris iris session IRIS -U USER
+'@ | docker exec --user 51773 -i knaights-task-control-demo iris session IRIS -U USER
 ```
+
+Retain the control task, its audit rows, history and receipt. Stop only this separately owned control production and container after readback:
+
+```powershell
+@'
+Set sc=##class(Ens.Director).StopProduction(30,0)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"TASK_CONTROL_STOPPED",!
+Halt
+'@ | docker exec --user 51773 -i knaights-task-control-demo iris session IRIS -U USER
+docker stop -t 50 knaights-task-control-demo
+```
+
+Do not remove the container while its evidence must be retained.
 
 ## Optional Codex MCP demonstration
 
@@ -145,7 +180,7 @@ The authenticated Codex MCP seat is a separate agent integration. Follow the [se
 
 ## Scope and recording
 
-The demonstrated application provides synthetic evidence review and one local task effect. Sequential task controls, actual restricted-user denial, evidence-change rejection, lock timeout, a bounded rollback condition, and same-artifact reinstall have been exercised. Concurrent first-execution testing remains incomplete. The native agent, Codex seat, and IPM lifecycle have separate qualification coverage. [Current qualification scope](INTEROPERABILITY.md#qualification-evidence)
+The demonstrated application provides synthetic evidence review and one local task effect. Sequential task controls, actual restricted-user denial, evidence-change rejection, lock timeout, a bounded rollback condition, and same-artifact reinstall have been exercised. A bounded two-worker first-execution test returned one execution and one duplicate response with the same receipt; broader load behavior is unqualified. The native agent, Codex seat, and IPM lifecycle have separate qualification coverage. [Current qualification scope](INTEROPERABILITY.md#qualification-evidence)
 
 Restrict ingress to trusted configured interfaces. Internal trusted callers can construct principal attribution in review messages. Task actor identity comes from the authenticated IRIS operator session. The review audit records attempts, while the task operation receipt supports duplicate reconciliation for this one task.
 

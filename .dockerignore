@@ -6,3 +6,5 @@
 !docker/bootstrap.sh
 !docker/bootstrap.script
 src/KnAIghts/DICOM3D/
+!LICENSE
+!NOTICE

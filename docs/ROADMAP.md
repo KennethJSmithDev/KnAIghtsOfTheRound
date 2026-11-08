@@ -4,7 +4,9 @@ The first implementation is a synthetic, governed review workflow. Work proceeds
 
 ## Contest delivery
 
-The immediate deliverables are the public source, installation documentation, judge walkthrough, and maintainer-managed Open Exchange and IPM publication. Follow the [publication checklist](PUBLICATION.md). Preserve the native-agent, installation, and task evidence at their recorded scopes. Concurrent first-execution testing remains an open qualification boundary.
+The immediate deliverables are the public source, installation documentation, judge walkthrough, and maintainer-managed Open Exchange and IPM publication. Follow the [publication checklist](PUBLICATION.md). Preserve the native-agent, installation, and task evidence at their recorded scopes. A bounded two-worker first-execution check passed; broader load and multi-user behavior remain future qualification boundaries.
+
+Local research prototypes have demonstrated shared live snapshots and failed-history recovery at scoped boundaries. Those qualifications do not imply that this core package ships a graphical client or admits its assets for redistribution.
 
 ## After submission
 

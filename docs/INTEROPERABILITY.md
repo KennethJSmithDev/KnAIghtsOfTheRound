@@ -143,7 +143,23 @@ docker stop -t 50 knaights-codex-demo
 
 `KnAIghts.Review.App.Submit()` uses a native `%AI.Agent` when `KNAIGHTS_LIVE=1`. `KNAIGHTS_PROVIDER_BASE_URL` selects an existing authorized endpoint. The implementation fixes the model to `gpt-oss:20b`, requires an evidence-tool call, bounds agent iterations to three, and requests at most 1,024 output tokens. `compose.live.yaml` provides the environment and read-only private configuration mount. The base profile leaves inference disabled.
 
-An operator enabling the native route must provide the endpoint and verify provider reachability, available memory, actual egress, tool calls, response validation, and persisted audit outcomes. An earlier standalone attempt stopped before inference because memory admission failed. A fresh November 7 run completed both native cases with the candidate image, an internal network, and an owned local relay. Each agent invoked ReadEvidence and returned a final decision. The generic live Compose network remains a separately configured path.
+An operator enabling the native route must provide the endpoint and verify provider reachability, resource admission, actual egress, response validation, and persisted audit outcomes. The current supported standalone path uses stock Ollama on Windows loopback and Docker Desktop's `host.docker.internal` on an ordinary bridge. That bridge permits broader outbound traffic; no host-only egress enforcement is implied. Matching and mismatched native decisions have been observed through this direct path. An earlier internal-network/relay qualification remains historical evidence, not a prerequisite or a supplied relay implementation.
+
+In a separate owned shell, use an already available model and model store:
+
+```powershell
+$env:OLLAMA_HOST = "127.0.0.1:53567"
+$env:OLLAMA_MODELS = "PATH_TO_EXISTING_MODEL_STORE"
+$env:OLLAMA_NO_CLOUD = "1"
+$env:OLLAMA_NOPRUNE = "1"
+$env:OLLAMA_CONTEXT_LENGTH = "2048"
+$env:OLLAMA_NUM_PARALLEL = "1"
+$env:OLLAMA_MAX_LOADED_MODELS = "1"
+ollama serve
+```
+
+Configure the application endpoint as `http://host.docker.internal:53567/v1`. Check the live process, listener, model identity and available RAM/commit immediately before submission; a readiness file alone can become stale. Do not start a competing model instance when resource admission fails. Provider startup, model loading and inference are separate observations. An already configured external provider is not silently substituted.
+
 
 The native agent accepts the same cases through the application entry point:
 
@@ -171,10 +187,10 @@ The public source includes this scope summary. Exact logs, credentials, transcri
 | Negative authorization and proposal controls | Wrong credentials and an unauthorized case were denied. A forced selection against mismatched evidence was rejected. |
 | Standalone native model route, November 7 | PASS in a fresh isolated candidate fixture. Two `%AI.Agent` submissions, four provider completions, one ReadEvidence tool call per case, accepted matching selection and mismatch review. Independent persisted audit and two message-route sessions matched. Graceful production/container stop, exit 0, no OOM. |
 | Deterministic trusted-proposal regression, November 7 | PASS for matching selection, mismatch review, forced selection rejection, unsupported citation rejection, H000 admission denial and exact audit readback. |
-| IPM installation | PASS with client 0.10.9 on Build 154 for source load, exact-source TGZ installation, explicit production start, synthetic tests and audit readback, restart persistence, uninstall and same-artifact reinstall. Registry publication remains pending. Build 109 compatibility is unverified. |
-| Synthetic task contract | Sequential proposal, approval, revised evidence, stale-approval rejection, one task update and duplicate receipt reconciliation passed. Authenticated restricted-user denial, lock timeout, changed evidence, bounded serialization-failure rollback and same-artifact reinstall passed separately. Concurrent first-execution testing remains incomplete. |
+| IPM installation | PASS with client 0.10.9 on Build 154 for source load, exact-source TGZ installation, explicit production start, synthetic tests and audit readback, restart persistence, uninstall and same-artifact reinstall. Registry publication remains pending. Other runtime builds are unverified. |
+| Synthetic task contract | Sequential proposal, approval, revised evidence, stale-approval rejection, one task update and duplicate receipt reconciliation passed. Authenticated restricted-user denial, lock timeout, changed evidence, bounded serialization-failure rollback and same-artifact reinstall passed separately. A bounded two-worker first-execution test returned one execution and one duplicate response with the same receipt; broader load behavior is unqualified. |
 | Source package | Application classes, configuration and these instructions. Graphical rehearsal and runtime evidence remain local. |
 
-The contest accepts Builds 109 and 154. Build 154 is the observed application qualification target. Portal availability of that exact Community archive is an operator prerequisite, and accepting another contest build does not establish its application compatibility. Qualification remains attached to the recorded fixture and source snapshots. These documentation instructions require a fresh installation run for a new environment.
+This entry is qualified on AI Hub Community Build 154. Organizers also permit Build 109, but that does not establish this application's compatibility. Portal access to the declared Community image is an operator prerequisite. Qualification remains attached to the recorded fixture and source snapshots. These documentation instructions require a fresh installation run for a new environment.
 
 The native agent and authenticated MCP integrations have separate test coverage. Direct trusted message callers can construct principal attribution, and audit rows record attempts rather than idempotent operations. Keep ingress restricted to the owned application.

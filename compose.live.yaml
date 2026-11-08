@@ -2,6 +2,8 @@
 # This override publishes no host ports.
 services:
   iris:
+    # Docker Desktop host-service mapping; this is not an egress allowlist.
+    extra_hosts: ["host.docker.internal:host-gateway"]
     environment:
       KNAIGHTS_LIVE: "1"
       KNAIGHTS_PROVIDER_BASE_URL: ${KNAIGHTS_PROVIDER_BASE_URL:?Configure an authorized local provider URL}

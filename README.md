@@ -28,7 +28,7 @@ Authorized evidence → Agent proposal → IRIS validation → Decision + audit 
 
 Both demonstration cases use the same `KnAIghtsEntry → AssessEvidence` production route. The agent chooses an action and cites its evidence. IRIS checks the exact ordered references and source agreement, then returns a typed result with an explanation, limitation, and audit ID.
 
-Clients can build on this shared review boundary. DICOM3D is the first planned domain adapter. Dashboards and an immersive Round Table interface are planned.
+Clients can build on this shared review boundary. DICOM3D is the first planned domain adapter. The optional dashboard and Round Table work are separately owned and are not shipped in this core package.
 
 ## Getting started
 
@@ -60,6 +60,8 @@ docker compose -f compose.yaml -f compose.live.yaml up --build -d
 
 The configured provider must be reachable from the container. The live override enables outbound network routing. Review the [native agent configuration](docs/INTEROPERABILITY.md#optional-native-agent-route) for endpoint admission, resource requirements, and verification.
 
+For a concise demonstration story and evidence distinctions, see [the demonstration guide](docs/DEMONSTRATION.md).
+
 ## Example workflow
 
 Follow the [judge walkthrough](docs/JUDGE-WALKTHROUGH.md) for a guided demonstration of native agent decisions, source validation, audit verification, and operator-approved task updates.
@@ -83,11 +85,11 @@ After a source-conflict review, an operator can propose, inspect, approve, and c
 
 **Version 0.1.0 candidate.** Native AI Hub and authenticated Codex MCP workflows have been demonstrated locally on Community Build 154 for the two synthetic cases, with independent audit and message checks. Citation rejection and source-mismatch controls have also been exercised.
 
-The native route currently supports the existing local `gpt-oss:20b` configuration. The contest accepts Builds 109 and 154, while application compatibility on Build 109 remains unverified. Local IPM installation, restart, uninstall, and same-package reinstall are tested. Registry publication remains pending. Detailed scope is recorded in [Interoperability](docs/INTEROPERABILITY.md#qualification-evidence).
+The native route currently supports the existing local `gpt-oss:20b` configuration. This entry is qualified on AI Hub Community Build 154. Organizers also accept Build 109, but its application compatibility is unverified. Local IPM installation, restart, uninstall, and same-package reinstall are tested. Registry publication remains pending. Detailed scope is recorded in [Interoperability](docs/INTEROPERABILITY.md#qualification-evidence).
 
 This is an early development application for demonstration and testing. Restrict ingress to trusted, configured interfaces. Trusted internal callers can construct principal attribution, and audit records represent individual attempts. Human review currently produces an auditable disposition. Durable reviewer delivery is planned.
 
-The synthetic task API has passed sequential state, permission, evidence-change, rollback, and reinstall checks. Concurrent first-execution testing remains incomplete. See the [task guide](docs/SYNTHETIC-TASK.md) for its supported scope.
+The synthetic task API has passed sequential state, permission, evidence-change, rollback, and reinstall checks. A bounded two-worker first-execution test returned one execution and one duplicate response with the same receipt; broader load behavior is unqualified. See the [task guide](docs/SYNTHETIC-TASK.md) for its supported scope.
 
 ## Roadmap
 

@@ -53,4 +53,4 @@ Keep the original review records and task history when collecting evidence. The 
 
 ## Testing status
 
-Sequential transitions, stale approval, duplicate receipt reconciliation, missing or changed evidence, authenticated restricted-user denial, lock timeout, and a bounded mid-write serialization failure have been exercised on Build 154. Same-package reinstall preserved the completed task, history and receipts. Concurrent first-execution testing remains incomplete. The sample requires trusted, configured ingress and an operator session with the stated permission.
+Sequential transitions, stale approval, duplicate receipt reconciliation, missing or changed evidence, authenticated restricted-user denial, lock timeout, and a bounded mid-write serialization failure have been exercised on Build 154. Same-package reinstall preserved the completed task, history and receipts. A bounded two-worker first-execution test returned one execution and one duplicate response with the same receipt; broader load behavior is unqualified. The sample requires trusted, configured ingress and an operator session with the stated permission.
