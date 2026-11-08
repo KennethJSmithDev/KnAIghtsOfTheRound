@@ -8,3 +8,4 @@
 src/KnAIghts/DICOM3D/
 !LICENSE
 !NOTICE
+!docker/secure-bootstrap.sh

@@ -1,0 +1,42 @@
+# Fresh local native-agent qualification. No published host ports.
+# Default none stays isolated. The explicit desktop-host profile may select only
+# an existing owned ordinary bridge, verified by scripts/live-session.py.
+services:
+  iris:
+    image: ${KNAIGHTS_APP_IMAGE:?Set the owned candidate image}
+    pull_policy: never
+    build:
+      context: .
+      args:
+        IRIS_IMAGE: ${KNAIGHTS_IRIS_IMAGE:?Set the already-present pinned vendor image}
+    command: ["--ISCAgent", "false", "--create", "/opt/knaights/secure-bootstrap.sh", "--password-file", "/home/irisowner/knaights-bootstrap/password.txt", "--after", "/opt/knaights/bootstrap.sh"]
+    environment:
+      KNAIGHTS_LIVE: "1"
+      KNAIGHTS_PROVIDER_BASE_URL: ${KNAIGHTS_PROVIDER_BASE_URL:-http://127.0.0.1:53571/v1}
+      KNAIGHTS_SEAT_PASSWORD_FILE: /run/knaights/seat-password.txt
+    volumes:
+      - type: bind
+        source: ${KNAIGHTS_QUALIFICATION_PRIVATE:?Prepare a fresh protected secret directory}
+        target: /run/knaights
+        read_only: true
+        bind:
+          create_host_path: false
+    labels:
+      org.kotr.owner: ${KNAIGHTS_QUALIFICATION_OWNER:?Set the finite campaign owner}
+    network_mode: ${KNAIGHTS_QUALIFICATION_NETWORK_MODE:-none}
+    # Docker's supported Desktop host mapping. It supplies no network access
+    # in the default none profile and does not restrict outbound bridge traffic.
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    cpus: 2
+    mem_limit: 3g
+    memswap_limit: 3g
+    pids_limit: 512
+    shm_size: 64m
+    security_opt: ["no-new-privileges:true"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "2"
+    stop_grace_period: 60s
+    restart: "no"

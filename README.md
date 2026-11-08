@@ -28,7 +28,7 @@ Authorized evidence → Agent proposal → IRIS validation → Decision + audit 
 
 Both demonstration cases use the same `KnAIghtsEntry → AssessEvidence` production route. The agent chooses an action and cites its evidence. IRIS checks the exact ordered references and source agreement, then returns a typed result with an explanation, limitation, and audit ID.
 
-Clients can build on this shared review boundary. DICOM3D is the first planned domain adapter. The optional dashboard and Round Table work are separately owned and are not shipped in this core package.
+Clients can build on this shared review boundary. DICOM3D is the first planned domain adapter. This local integrated candidate retains the optional dashboard and Round Table source. Its licensed knight asset is supplied separately; the curated IPM package remains core-only. See [graphical setup](docs/GRAPHICAL_RELEASE.md).
 
 ## Getting started
 

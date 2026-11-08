@@ -1,0 +1,55 @@
+{
+  "events": [
+    {
+      "caseId": "synthetic-a",
+      "tool": "ReadSyntheticEvidence",
+      "ctStudy": "urn:example:study-a",
+      "segStudy": "urn:example:study-a"
+    },
+    {
+      "caseId": "synthetic-b",
+      "tool": "ReadSyntheticEvidence",
+      "ctStudy": "urn:example:study-a",
+      "segStudy": "urn:example:study-b"
+    },
+    {
+      "caseId": "synthetic-a",
+      "tool": "SubmitSyntheticDecision",
+      "response": {
+        "caseId": "synthetic-a",
+        "status": "ACCEPTED",
+        "action": "SHOW_VERIFIED",
+        "citations": [
+          "ImagingStudy/example-ct",
+          "ImagingSelection/example-segment"
+        ],
+        "semanticId": "synthetic.structure.001",
+        "auditId": 2,
+        "explanation": "The synthetic selection and the source image refer to the same study.",
+        "limitation": "Synthetic example for workflow education."
+      }
+    },
+    {
+      "caseId": "synthetic-b",
+      "tool": "SubmitSyntheticDecision",
+      "response": {
+        "caseId": "synthetic-b",
+        "status": "REVIEW_REQUESTED",
+        "action": "REQUEST_REVIEW",
+        "citations": [
+          "ImagingStudy/example-ct",
+          "ImagingSelection/example-segment"
+        ],
+        "semanticId": "",
+        "auditId": 3,
+        "explanation": "The evidence needs review before a source selection can be shown.",
+        "limitation": "Synthetic example for workflow education."
+      }
+    }
+  ],
+  "evidence": {
+    "codex-2.jsonl": "0d5e296604191ea8b64b25fad84411d27c57ea3b32114168b6fc54c0cb639293",
+    "synthetic-gate.json": "3e6a9b761d8c152187ad9812ab5c757356dbf967c00991b656e853fec074939a",
+    "independent-route-audit.log": "4c62b4de9033344a12a505b559328ac57159bbc6bfd058bbd0ba5af1bd36c3a5"
+  }
+}

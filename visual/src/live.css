@@ -1,0 +1,62 @@
+/* Shared evidence chrome around the retained chamber and camera composition. */
+.stage { grid-template-rows: auto minmax(0, 1fr) auto; min-height: 440px; }
+.stage > header {
+  padding: .72rem clamp(1rem, 2.4vw, 2.3rem);
+  background: linear-gradient(110deg, #211718, #171719);
+  border-bottom-color: #946a3c;
+  box-shadow: 0 3px 20px #08080966;
+}
+.seal { width: 3.15rem; height: 3.15rem; overflow: hidden; border-color: #d6a452; box-shadow: 0 0 18px #a473262d; flex: none; }
+.seal img { width: 100%; height: 100%; object-fit: cover; }
+.identity { gap: .72rem; }
+.identity h1 { font-size: clamp(1.16rem, 1.8vw, 1.55rem); }
+.identity .overline { font-size: .62rem; letter-spacing: .14em; }
+.council-toolbar { gap: .42rem; max-width: 75%; }
+.council-toolbar button { padding: .42rem .58rem; font-size: .77rem; }
+.session-nav { border-color: #34666c; background: #142529; }
+.session-nav button[aria-pressed="true"] { border-color: #55c5d1; background: #1e4249; color: #ddfcff; }
+button.run-rehearsal { background: linear-gradient(#a47536, #72502c); border-color: #d5a45e; }
+.refresh-session { border-color: #65513c; }
+button:disabled { cursor: default; opacity: .5; }
+.stage[data-session-mode="live"][data-projection="verified"] .projection-mode { border-color: #4cbfcb; color: #bdfaff; }
+.projection-mode { letter-spacing: .02em; }
+.speaker-bubble { max-height: min(28vh, 11rem); overflow: auto; pointer-events: auto; scrollbar-color: #b58c60 #201718; }
+.speaker-bubble.native { border-color: #5aadb8; }
+.speaker-bubble.native strong { color: #9be7ef; }
+.speaker-bubble.native::after { border-color: #5aadb8; }
+.book-backdrop { position: absolute; inset: 0; z-index: 5; background: #0a0b102b; }
+.book-dialog { width: min(64rem, calc(100% - 2rem)); max-height: calc(100% - 1.4rem); border-color: #d0a465; }
+.book-heading { padding: .65rem .9rem; }
+.ledger-page { font-size: .88rem; line-height: 1.46; padding: .85rem 1rem; }
+.ledger-origin { color: #79522b; font-size: .75rem; font-weight: 650; }
+.ledger-facts dd { overflow-wrap: anywhere; }
+.ledger-pending { padding: .55rem; border-left: 3px solid #3e7c83; background: #d2e2d9; }
+.ledger-error { padding: .55rem; border-left: 3px solid #a4513a; background: #efd2bf; color: #682e21; }
+.operator-task { border-top: 1px solid #ba9862; margin-top: .85rem; padding-top: .7rem; }
+.operator-task h4 { font-size: .93rem; }
+.operator-task .source-note { font-size: .74rem; }
+.session-state { max-width: min(66rem, 75%); overflow-wrap: anywhere; }
+.session-state.error, .session-state.uncertain { color: #ffc6a9; }
+.stage > footer { padding: .6rem clamp(1rem, 2.4vw, 2.3rem); }
+.dashboard { width: min(100%, 80rem); }
+.dashboard-card .ledger-page { min-height: 21rem; }
+@media (max-width: 1100px) {
+  .stage > header { align-items: flex-start; }
+  .council-toolbar { max-width: 70%; }
+}
+@media (max-width: 760px) {
+  .stage > header { flex-wrap: wrap; }
+  .council-toolbar { width: 100%; max-width: 100%; justify-content: flex-start; }
+  .ledger-pages { grid-template-columns: 1fr; }
+  .ledger-page { padding: .65rem .75rem; }
+  .session-state { max-width: 100%; }
+}
+@media (max-height: 620px) {
+  .stage { min-height: 100svh; }
+  .stage > header, .stage > footer { padding-block: .38rem; }
+  .seal { width: 2.4rem; height: 2.4rem; }
+  .council-toolbar button { padding: .3rem .44rem; }
+  .projection-tools { top: .4rem; }
+  .speaker-bubble { max-height: 24vh; }
+  .book-dialog { max-height: calc(100% - .8rem); bottom: .4rem; }
+}

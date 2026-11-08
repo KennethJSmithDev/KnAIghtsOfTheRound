@@ -194,3 +194,7 @@ The public source includes this scope summary. Exact logs, credentials, transcri
 This entry is qualified on AI Hub Community Build 154. Organizers also permit Build 109, but that does not establish this application's compatibility. Portal access to the declared Community image is an operator prerequisite. Qualification remains attached to the recorded fixture and source snapshots. These documentation instructions require a fresh installation run for a new environment.
 
 The native agent and authenticated MCP integrations have separate test coverage. Direct trusted message callers can construct principal attribution, and audit rows record attempts rather than idempotent operations. Keep ingress restricted to the owned application.
+
+## Integrated source package boundary
+
+For this integrated local candidate, use scripts/package-ipm.py to obtain the qualified twelve-class core TGZ. Folder import of the additional LiveSession classes is a different fourteen-class inventory and has not received that IPM lifecycle qualification. The optional graphical client and its separately licensed asset prerequisite are described in GRAPHICAL_RELEASE.md.

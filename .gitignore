@@ -26,3 +26,7 @@ iris.key
 
 # Retained research adapter awaits independent source-validation qualification.
 src/KnAIghts/DICOM3D/H000Evidence.cls
+
+# Separately licensed local presentation material; never included in source archives.
+/visual/public/assets/void-shepherd/*
+!/visual/public/assets/void-shepherd/ASSET_NOTICE.md

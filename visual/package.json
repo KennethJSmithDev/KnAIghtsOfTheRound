@@ -1,0 +1,23 @@
+{
+  "name": "knaights-visual-local",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Optional local KnAIghts session interface candidate",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite --host 127.0.0.1"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.6.1",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "vite": "8.2.4"
+  }
+}

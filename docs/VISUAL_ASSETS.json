@@ -1,0 +1,18 @@
+{
+  "asset": "Void Shepherd",
+  "creator": "DarkPaperVerse",
+  "license": "Fab Standard License",
+  "source": "https://www.fab.com/listings/231c78d8-4879-4f52-9c9b-37a8b42ddc6c",
+  "files": [
+    {
+      "path": "visual/public/assets/void-shepherd/scene.bin",
+      "sha256": "67c8855114d5e82c08e55266fe8ee39ed1eb8247a892c1920f9fa10841b6817b"
+    },
+    {
+      "path": "visual/public/assets/void-shepherd/scene.gltf",
+      "sha256": "55c195fd16422e3d4cc6fb63affdf4f904179aa8350ca5c6bafcfedcc9597a63"
+    }
+  ],
+  "distribution": "Separatelylicensedlocalprerequisite; binariesexcludedfromsourcearchive",
+  "modelInput": false
+}

@@ -1,0 +1,17 @@
+Set sc=##class(Security.Resources).Create("KnAIghtsSeatUse","Authorized synthetic live endpoint","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(Security.Roles).Create("KnAIghtsSeatReader","Restricted synthetic seat","KnAIghtsSeatUse:U,%DB_USER:R,%DB_IRISLIB:R,%DB_ENSLIB:R,%DB_HSLIB:R,%DB_IRISTEMP:RW","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(Security.Roles).Create("KnAIghtsSeatMessage","Message persistence only during the application","%DB_USER:RW","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set file=##class(%Stream.FileCharacter).%New(),file.Filename=$SYSTEM.Util.GetEnviron("KNAIGHTS_SEAT_PASSWORD_FILE")
+If file.Filename="" { Write !,"LIVE_PROVISION_FAIL missing secret path",! Halt }
+Set p("Roles")="KnAIghtsSeatReader",p("Password")=$ZStrip(file.Read(),"<>W"),p("Enabled")=1,p("ChangePassword")=0,p("NameSpace")="USER"
+Set sc=##class(Security.Users).Create("knaights_codex",.p)
+Kill p,file
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set p("NameSpace")="USER",p("DispatchClass")="KnAIghts.LiveSession.Api",p("Enabled")=1,p("Type")=2,p("AutheEnabled")=32,p("Resource")="KnAIghtsSeatUse",p("MatchRoles")="KnAIghtsSeatReader:KnAIghtsSeatMessage"
+Set sc=##class(Security.Applications).Create("/knaights-live",.p)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"KNAIGHTS_LIVE_PROVISION_OK",!
+Halt
