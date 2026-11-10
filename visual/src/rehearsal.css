@@ -265,6 +265,7 @@ button.book-close:hover { background: #60412e; }
   overflow-wrap: anywhere;
 }
 .dashboard-card h3 { margin: 0 0 .37rem; color: #ebc697; font: 700 1.06rem/1.2 Georgia, serif; }
+.dashboard-card .ledger-page h3 { color: #503321; }
 .dashboard-card ul { padding-inline-start: 1.08rem; }
 .dashboard-card dl { margin: .44rem 0; }
 .dashboard-card dd { margin-inline-start: .65rem; }

@@ -1,0 +1,8 @@
+Set sc=##class(Ens.Director).GetProductionStatus(.name,.state)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+If ($Get(name)'=""),($Get(name)'="KnAIghts.Seats.Production") { Write "Another production is in use",! Halt }
+If +$Get(state)=4 { Write "Troubled production requires operator review",! Halt }
+Set sc=##class(Ens.Director).StartProduction("KnAIghts.Seats.Production")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"KOTR_SEAT_PRODUCTION_STARTED",!
+Halt

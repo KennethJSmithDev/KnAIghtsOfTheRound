@@ -1,0 +1,22 @@
+Set sc=##class(Ens.Director).GetProductionStatus(.name,.state)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+If (name'="KnAIghts.Review.Production")!(state'=1) { Write "CONTEXT_WRONG_PRODUCTION",! Halt }
+Set sc=##class(Ens.Director).StopProduction(30,0)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(Ens.Director).StartProduction("KnAIghts.Context.Production")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(Ens.Director).SetAdapterSettingValue("KnAIghtsNotice","Directory","/tmp/knaights-context-live-notices")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(Ens.Director).UpdateProduction()
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(KnAIghts.Bonus.Setup).EnsureActions()
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(EnsLib.Workflow.UserDefinition).CreateUser("knaights_operator","Local synthetic Workflow operator")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set user=##class(EnsLib.Workflow.UserDefinition).IDOpen("knaights_operator"),role=##class(EnsLib.Workflow.RoleDefinition).IDOpen("KnAIghtsReviewers")
+If ('$IsObject(user))!('$IsObject(role)) { Write "CONTEXT_WORKFLOW_ROLE_MISSING",! Halt }
+Set member=##class(EnsLib.Workflow.RoleMembership).%New(),member.User=user,member.Role=role,member.Ranking=1
+Set sc=member.%Save()
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"CONTEXT_LIVE_PRODUCTION_OK",!
+Halt

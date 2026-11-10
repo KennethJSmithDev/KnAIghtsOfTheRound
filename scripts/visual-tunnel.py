@@ -17,7 +17,7 @@ print('{"ready":true}',flush=True)
 for line in sys.stdin:
  try:
   v=json.loads(line)
-  if (v['method'],v['path']) not in [('GET','/knaights-live/v1/session'),('POST','/knaights-live/v1/run')]:raise ValueError('route')
+  if (v['method'],v['path']) not in [('GET','/knaights-live/v1/session'),('POST','/knaights-live/v1/run'),('POST','/knaights-operator/v1/queue'),('POST','/knaights-operator/v1/status'),('POST','/knaights-operator/v1/decision'),('GET','/kotr-health/v1/sources'),('POST','/kotr-health/v1/state'),('POST','/kotr-health/v1/inspect')]:raise ValueError('route')
   body=base64.b64decode(v['body']) if v['method']=='POST' else None
   if body and len(body)>1024:raise ValueError('size')
   req=urllib.request.Request('http://127.0.0.1:52773'+v['path'],data=body,method=v['method'],headers={'Content-Type':'application/json','Authorization':v['authorization']})
@@ -35,7 +35,7 @@ lock=threading.Lock()
 class Handler(BaseHTTPRequestHandler):
  def log_message(self,*a):pass
  def serve(self):
-  if self.path not in ('/knaights-live/v1/session','/knaights-live/v1/run'):self.send_error(404);return
+  if (self.command,self.path) not in (('GET','/knaights-live/v1/session'),('POST','/knaights-live/v1/run'),('POST','/knaights-operator/v1/queue'),('POST','/knaights-operator/v1/status'),('POST','/knaights-operator/v1/decision'),('GET','/kotr-health/v1/sources'),('POST','/kotr-health/v1/state'),('POST','/kotr-health/v1/inspect')):self.send_error(404);return
   n=int(self.headers.get('Content-Length','0'))
   if not 0<=n<=1024:self.send_error(413);return
   item={'method':self.command,'path':self.path,'authorization':self.headers.get('Authorization',''),'body':base64.b64encode(self.rfile.read(n)).decode()}
@@ -53,7 +53,17 @@ try:
   config=json.loads(config_path.read_text(encoding='utf-8'))
   config['baseUrl']=f'http://127.0.0.1:{server.server_port}/knaights-live'
   config_path.write_text(json.dumps(config),encoding='utf-8')
-  (ROOT/'gateway-tunnel-ready.json').write_text(json.dumps({'pid':os.getpid(),'guestProcessPid':guest.pid,'container':cid,'port':server.server_port,'fixedDestination':'guest127.0.0.1:52773/knaights-live/v1 only'}))
+  operator_path=ROOT/'private/broker-operator.json'
+  if operator_path.exists():
+   operator=json.loads(operator_path.read_text(encoding='utf-8'))
+   operator['baseUrl']=f'http://127.0.0.1:{server.server_port}/knaights-operator'
+   operator_path.write_text(json.dumps(operator),encoding='utf-8')
+  health_path=ROOT/'private/broker-health.json'
+  if health_path.exists():
+   health=json.loads(health_path.read_text(encoding='utf-8'))
+   health['baseUrl']=f'http://127.0.0.1:{server.server_port}/kotr-health'
+   health_path.write_text(json.dumps(health),encoding='utf-8')
+  (ROOT/'gateway-tunnel-ready.json').write_text(json.dumps({'pid':os.getpid(),'guestProcessPid':guest.pid,'container':cid,'port':server.server_port,'fixedDestination':'allowlisted guest127.0.0.1:52773 live, operator and health routes only'}))
   deadline=datetime.datetime.fromisoformat(json.loads((ROOT/'OWNER.json').read_text())['deadlineUtc']).timestamp()
   while time.time()<deadline and not (ROOT/'STOP_GATEWAY').exists():server.handle_request()
 finally:

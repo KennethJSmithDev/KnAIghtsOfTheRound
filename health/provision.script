@@ -1,0 +1,4 @@
+Set sc=##class(Security.Resources).Create("KnAIghtsHealthUse","Operator-owned synthetic health source inspection","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"KOTR_HEALTH_RESOURCE_OK",!
+Halt

@@ -1,33 +1,52 @@
 # Development tracks
 
-The first implementation is a synthetic, governed review workflow. Work proceeds in two tracks so contest delivery has a stable source and demonstration path.
+KotR's native agent proposes an evidence-based action; IRIS owns source validation,
+dispositions and audit. Optional interfaces and interoperability profiles build on
+that boundary without granting approval or execution authority implicitly.
 
-## Contest delivery
+## Available at recorded local scopes
 
-The immediate deliverables are the public source, installation documentation, judge walkthrough, and maintainer-managed Open Exchange and IPM publication. Follow the [publication checklist](PUBLICATION.md). Preserve the native-agent, installation, and task evidence at their recorded scopes. A bounded two-worker first-execution check passed; broader load and multi-user behavior remain future qualification boundaries.
+| Capability | Implemented outcome | Qualification boundary |
+| --- | --- | --- |
+| Native AI Hub and Codex MCP review | Matching synthetic evidence is accepted; conflicting evidence requests review without a verified selection. | Build 154, two synthetic cases, independent audit/message checks; broader runtime/provider compatibility is unqualified. |
+| Synthetic task | Evidence-bound operator approval and a guarded task update with duplicate receipts. | Sequential and bounded two-worker checks; broad load and multi-user behavior remain unqualified. |
+| Round Table, dashboard and Book | Shared case state, original procedural knights and a lightweight view; recorded replay and static simulation are disclosed separately. | Scoped browser checks; physical-phone thermal/battery behavior remains deferred. |
+| Workflow, custom adapter, Java PEX and vector context | Mismatch worklist, six hand-defined advisory features, checked PEX context, authorized review and persisted notice shown in the Book. | Local connected native/browser flow; review stays separate from synthetic task approval and execution. |
+| Provider/account/seat options | Supported client sign-in options, direct local ChatGPT account/model selection, per-seat permissions and scheduling. | One real ChatGPT registration and two real direct reviews; other real accounts, remote expiry/revocation, hosted tenancy and broad concurrency remain unqualified. |
+| Health-source interoperability | Synthetic DICOM/DICOMweb/Orthanc reads, authenticated native R4 resource reads, C-ECHO Verification, MLLP/ACK/replay and separate viewer/MCP controls. | Protocol-specific local fixtures; no clinical use, patient matching, DIMSE query/retrieve/storage or R5 repository claim. |
 
-Local research prototypes have demonstrated shared live snapshots and failed-history recovery at scoped boundaries. Those qualifications do not imply that this core package ships a graphical client or admits its assets for redistribution.
+Use [the judge walkthrough](JUDGE-WALKTHROUGH.md) for the core contest execution,
+[connected review setup](CONTEXT-LIVE.md), [health controls](HEALTH-CONTROLS.md)
+and [local accounts](SEATS-LOCAL.md) for the optional profiles. A native class or
+source file is not proof of a complete install or combined deployment.
 
-## After submission
+## Distribution and qualification work
 
-### Connect one live session
+- Reconcile an explicit integrated package profile with the intended class,
+  Python, Java and schema inventory, preserving the default core package identity
+  and bytes. Qualify that exact artifact through installation, restart, uninstall
+  and same-artifact reinstall before claiming parity.
+- Verify the actual public package after operator-controlled registry activation.
+  Local lifecycle evidence does not establish registry availability.
+- Follow the documented setup from a declared fresh environment using the exact
+  source and vendor prerequisites a reviewer can obtain. Preserve meaningful
+  success, refusal, recovery and authority checks.
+- Prepare genuine review media with source/capture provenance and privacy/rights
+  checks. Optional articles, video publication, Open Exchange and contest actions
+  remain separate operator-owned steps.
 
-Reuse the existing Round Table prototype's shared session state. Its dashboard and Book of Receipts already render the same ledger. Replace recorded fixture playback through a small session adapter, preserving the scene and its controls.
+## Planned interoperability expansion
 
-The server must provide an authenticated, correlated session snapshot containing the validated response, actual actor, source references, audit identity, and task state. Its audit readback must agree with the returned response. The current source exposes class methods and two synthetic MCP tools; a browser session transport and reliable event correlation remain integration work.
+Add native DIMSE C-FIND and separately negotiated retrieval/storage paths; broader
+HL7 ADT, ORM/OMI, amendment and MDM semantics; and independently qualified R5 and
+SMART/OAuth repository profiles. Preserve each source's identifiers, versions,
+transport outcome and original evidence. Patient/image/report relationships need
+explicit source evidence rather than text similarity.
 
-Keep source acceptance, operator approval, and completed task execution as distinct states. Source `ACCEPTED` permits a verified selection. It does not grant permission to execute a task. Live speech bubbles must follow recorded service events and actual seat identities.
+Further directions include DICOM SR/SEG source references, CDA/C-CDA, IHE document
+exchange, openEHR and terminology-governed findings. These are plans, not qualified
+features. DICOM3D visualization remains a separately owned domain integration.
 
-Qualify both views against the same snapshot, including missing or reordered updates, timeout, disconnect, stale approval, mismatch suppression and duplicate receipt reconciliation. Keep credentials on the server and restrict the service to its authorized cases and operations. Establish transport and authorization ownership before introducing a live route.
-
-### Polish the existing scene
-
-Apply the supplied identity to the existing Arthur's-chair view. Preserve the close seated camera, partly visible book, nearby seats and projector ending at the hologram's feet. Improve control readability, focus and speech-bubble placement while maintaining clear recorded/live status and the same ledger in both views.
-
-Measure responsiveness and rendering costs on the actual target browser. Preserve reduced-motion behavior and qualify interaction independently from backend decisions.
-
-## Later asset and presentation work
-
-Replace placeholders with original, optimized knight assets after their source and redistribution rights are established. Preserve stable seat identity while changing character appearance. Measure geometry, textures, memory and draw calls before selecting budgets.
-
-Add holographic projections, animation and cinematic lighting through the existing renderer. Effects must follow session truth and keep evidence readable. Domain visualization remains a separately owned adapter, beginning with the planned DICOM3D integration.
+Broader deployment isolation, account/provider coverage, constrained-network
+measurements, cache/invalidation policy and physical-device performance need their
+own bounded evidence before promotion. No dates or public availability are implied.

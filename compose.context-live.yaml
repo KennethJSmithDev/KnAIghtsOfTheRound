@@ -1,0 +1,5 @@
+# Explicit local-only override; the default review production is unchanged.
+services:
+  iris:
+    environment:
+      KNAIGHTS_CONTEXT_LIVE: "1"

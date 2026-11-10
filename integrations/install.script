@@ -1,0 +1,8 @@
+Set sc=$SYSTEM.OBJ.Load("/opt/knaights/integrations/iris/Policy.cls","ck")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=$SYSTEM.OBJ.Load("/opt/knaights/integrations/iris/Tools.cls","ck")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=$SYSTEM.OBJ.Load("/opt/knaights/integrations/iris/MCP.cls","ck")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"KOTR_INTEGRATION_CLASSES_OK",!
+Halt

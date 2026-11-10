@@ -1,0 +1,7 @@
+{
+  "irisUrl": "http://127.0.0.1:52773/kotr-seats",
+  "state": ".local/seats/state",
+  "workerCredentials": ".local/seats/worker.json",
+  "port": 50964,
+  "deadlineUtc": "REPLACE_WITH_AN_EXPLICIT_FUTURE_UTC_DEADLINE"
+}

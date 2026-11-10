@@ -6,6 +6,8 @@
 .local-*/
 .secrets/
 *.log
+__pycache__/
+*.py[cod]
 
 # Vendor images, built archives and local imaging
 *.tar
@@ -26,6 +28,9 @@ iris.key
 
 # Retained research adapter awaits independent source-validation qualification.
 src/KnAIghts/DICOM3D/H000Evidence.cls
+
+# Optional health-source dependency installation is supplied separately.
+/health/vendor/
 
 # Separately licensed local presentation material; never included in source archives.
 /visual/public/assets/void-shepherd/*

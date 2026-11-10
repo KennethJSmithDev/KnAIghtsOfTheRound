@@ -1,0 +1,6 @@
+Set sc=$SYSTEM.OBJ.Load("/opt/knaights/health/mcp/Policy.cls","ck")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=$SYSTEM.OBJ.LoadDir("/opt/knaights/health/mcp","ck",.errors,1)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"KOTR_HEALTH_MCP_CLASSES_OK",!
+Halt

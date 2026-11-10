@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "dataScope": "synthetic-only",
+  "authority": "source inspection does not authorize selection, diagnosis, Workflow decisions or execution",
+  "protocols": [
+    {
+      "id": "dicom-part10",
+      "stage": "LOCALLY_EXERCISED",
+      "operations": [
+        "identity metadata read",
+        "byte-preserving archive"
+      ],
+      "limits": [
+        "one synthetic CT",
+        "no pixel decoding",
+        "no SR/SEG content interpretation"
+      ]
+    },
+    {
+      "id": "dicomweb",
+      "stage": "LOCALLY_EXERCISED",
+      "operations": [
+        "QIDO-RS study lookup",
+        "WADO-RS instance metadata",
+        "WADO-RS single-instance multipart retrieval"
+      ],
+      "limits": [
+        "one Orthanc synthetic CT",
+        "no STOW-RS or other write transaction"
+      ]
+    },
+    {
+      "id": "orthanc-rest",
+      "stage": "LOCALLY_EXERCISED",
+      "operations": [
+        "instance/series/study metadata",
+        "instance file retrieval"
+      ],
+      "limits": [
+        "one isolated cached server build",
+        "Orthanc IDs remain separate from DICOM UIDs"
+      ]
+    },
+    {
+      "id": "fhir-r4-r5",
+      "stage": "LOCALLY_EXERCISED_R4",
+      "operations": [
+        "CapabilityStatement version check",
+        "authenticated native R4 reads of ImagingStudy, DiagnosticReport, Observation, DocumentReference, ServiceRequest and Provenance",
+        "resource version/ETag retention and amendment observations"
+      ],
+      "limits": [
+        "R5 remains synthetic HTTP-fixture scope",
+        "synthetic resources only",
+        "no clinical or full profile-validation claim",
+        "inspection performs GET only; fixture writes used a separate operator account"
+      ]
+    },
+    {
+      "id": "hl7v2",
+      "stage": "LOCALLY_EXERCISED",
+      "operations": [
+        "IRIS native VDoc parsing of ASCII 2.5 ORU_R01",
+        "MSH identity projection",
+        "custom component delimiter",
+        "optional native MLLP receiver",
+        "application ACK and control-ID/digest replay handling"
+      ],
+      "limits": [
+        "ASCII 2.5 ORU_R01 MLLP fixture",
+        "custom delimiter qualification remains the earlier native parsing scope",
+        "no full schema validation, patient identity matching or broad crash/load qualification"
+      ]
+    },
+    {
+      "id": "dicom-dimse",
+      "stage": "LOCALLY_EXERCISED",
+      "operations": [
+        "native IRIS C-ECHO Verification receiver",
+        "calling/called AET and Verification presentation-context admission"
+      ],
+      "limits": [
+        "loopback synthetic fixture",
+        "no query, retrieval or image storage",
+        "AET admission does not establish clinical authentication"
+      ],
+      "plannedOperations": [
+        "C-FIND",
+        "C-GET",
+        "C-MOVE/C-STORE"
+      ]
+    },
+    {
+      "id": "hl7v2-workflows",
+      "stage": "PLANNED",
+      "operations": [
+        "ADT",
+        "ORM/OMI",
+        "ORU amendments",
+        "MDM"
+      ],
+      "limits": [
+        "MLLP/ACK has a separate ORU_R01 transport qualification",
+        "each additional message profile requires its own semantics and replay tests"
+      ]
+    },
+    {
+      "id": "medical-documents",
+      "stage": "PLANNED",
+      "operations": [
+        "DICOM SR/SEG",
+        "CDA/C-CDA",
+        "IHE document exchange",
+        "openEHR",
+        "terminology-linked findings"
+      ],
+      "limits": [
+        "each source/version/security/terminology contract requires independent qualification"
+      ]
+    }
+  ],
+  "controls": {
+    "stage": "LOCALLY_EXERCISED",
+    "paths": [
+      "separate three-tool health MCP endpoint",
+      "authenticated health API",
+      "lazy local viewer panel",
+      "Book and dashboard observation"
+    ],
+    "limits": [
+      "explicit resource and source grants",
+      "retained-state refresh does not recapture",
+      "no clinical or model-inference claim",
+      "not part of default core IPM",
+      "static simulation remains independent"
+    ]
+  }
+}

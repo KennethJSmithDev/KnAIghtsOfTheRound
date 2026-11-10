@@ -1,0 +1,8 @@
+The ChatGPT account adapter in account.mjs is adapted from ISAIAH, by Kenneth
+Smith / KennethJSmithDev, under the Apache License 2.0. Changes add independent
+saved registrations using a shared installation host identity. Retain this
+attribution and the parent project's Apache license in distributions.
+
+The Sign in with ChatGPT DevKit is not included. OAuth behavior is implemented
+against the official protocol documentation. The separately installed jose
+dependency retains its MIT license and notices.

@@ -1,0 +1,4 @@
+Set sc=$SYSTEM.OBJ.LoadDir("/opt/knaights/seats/iris","ck",.errors,1)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"KOTR_SEAT_CLASSES_OK",!
+Halt

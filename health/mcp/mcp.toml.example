@@ -1,0 +1,13 @@
+[mcp]
+transport = "stdio"
+
+[[iris]]
+name = "kotr-health"
+server = {host="127.0.0.1",port=1972,username="<private-gateway-user>",password="<private-gateway-password>"}
+pool = {min=1,max=1}
+endpoints = [{path="/mcp/kotr-health",username="<health-principal>",password="<private-health-password>"}]
+
+[logging]
+level = "warn"
+output = "file"
+file = "/tmp/kotr-health-mcp.log"

@@ -186,7 +186,7 @@ Restrict ingress to trusted configured interfaces. Internal trusted callers can 
 
 For a recording, capture the actual native request and results, a separate audit/message readback, and the task's stale and duplicate controls. A screen capture of the two command windows and final task state can show this workflow directly. Keep model credentials, portal details, and unrelated instance data outside the capture. This guide provides a filming sequence. It makes no claim that a new run or recording has been performed.
 
-The dashboard, immersive Round Table, Book of Receipts interface, domain visualization, and human-review delivery remain roadmap items. Present them as planned development when discussing the entry.
+The optional Round Table, dashboard and Book of Receipts are implemented as separately configured source profiles. The local Workflow profile provides a synthetic worklist and notice. These capabilities are outside the twelve-class core IPM package; broader domain delivery and production qualification remain planned.
 
 ### Suggested narration
 

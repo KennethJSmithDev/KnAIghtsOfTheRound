@@ -1,6 +1,33 @@
 # Optional local visual candidate
 
-This private candidate packages the retained Book-fixed Round Table interface as an optional `visual/` frontend. It uses the existing Arthur camera, table, chairs, projector, Book of Receipts, dashboard, replay fixture, and accepted live-session controller. Its source and assets were copied as UTF-8 bytes from the retained candidate. The application source and the private runtime state have separate ownership.
+This private candidate packages the retained Book-fixed Round Table interface as an optional `visual/` frontend. It uses the existing Arthur camera, table, chairs, projector, Book of Receipts, dashboard, replay fixture, and accepted live-session controller. The application source and the private runtime state have separate ownership.
+
+## Local tool storage
+
+Keep a single project checkout on the chosen data drive. Run commands from that
+project root and keep private state, tool caches and generated output within its
+ignored `.local/` directory. On Windows, a checkout on D: can still inherit C:
+temporary/cache defaults. The following current-shell settings keep these tool
+outputs under the project:
+
+```powershell
+$toolLocal = Join-Path (Get-Location) '.local/tools'
+$env:TEMP = Join-Path $toolLocal 'tmp'
+$env:TMP = $env:TEMP
+$env:npm_config_cache = Join-Path $toolLocal 'npm-cache'
+New-Item -ItemType Directory -Force -Path $env:TEMP | Out-Null
+```
+
+Reuse this location across the viewer and seat workspace. It does not copy or
+move an existing global cache. An empty project-local cache needs the documented
+registry-enabled install before an offline install can succeed.
+
+Docker images and writable layers belong to Docker's configured data disk,
+which can still be on C:. Check that disk's location and host free space before
+a build, fixture or snapshot. The supplied profiles limit CPU/RAM, not host-disk
+growth. Establish a measured storage allowance and headroom first. Moving shared
+Docker data is a separate operator operation. Preserve accepted state and reuse
+a matching owned environment rather than making another checkout or model copy.
 
 ## Frontend prerequisites and build
 
@@ -13,9 +40,9 @@ npm --prefix visual ci --offline --ignore-scripts --no-audit --no-fund
 npm --prefix visual run build
 ```
 
-The offline command requires a complete npm cache for the selected platform. Local preparation verified the SHA-512 content of all 33 Windows x64-eligible cached package tarballs. A new installation can use `npm --prefix visual ci --ignore-scripts --no-audit --no-fund` with registry access to acquire the same locked packages. These commands acquire frontend dependencies, with the IRIS vendor image and model supplied separately.
+The offline command requires a complete npm cache for the selected platform. Local preparation verified the SHA-512 content of all 33 Windows x64-eligible cached package tarballs. A new installation can use `npm --prefix visual ci --ignore-scripts --no-audit --no-fund` with registry access to acquire the same locked packages. These commands acquire frontend dependencies, with the IRIS vendor image and inference model supplied separately.
 
-The frontend has its own package manifest and lock. It requires no dependency junction or workspace source from another project. This preparation generated the lock without building the application. The fresh-checkout build and combined runtime retain their own qualification results.
+The frontend has its own package manifest and lock. The frontend build and combined runtime have separate qualification results.
 
 ## Owned backend and same-origin server
 
@@ -28,7 +55,7 @@ python scripts/visual-tunnel.py --state .local/session
 python scripts/visual-server.py --state .local/session
 ```
 
-The tunnel connects only to the configured owned IRIS Web Gateway and records its host loopback endpoint. The visual server serves `visual/dist` and the same-origin session API. It holds the restricted IRIS credential and has no Docker authority. Inspect current port ownership before startup. Reuse a healthy matching owned runtime on its designated port.
+The tunnel connects only to the configured owned IRIS Web Gateway and records its host loopback endpoint. The visual server serves `visual/dist` and the same-origin session API. It holds the restricted IRIS credential and has no Docker authority. The opt-in [context-live profile](CONTEXT-LIVE.md) additionally admits three fixed synthetic operator routes through a separate credential and access key. Inspect current port ownership before startup. Reuse a healthy matching owned runtime on its designated port.
 
 Read the protected readiness record in the state directory and open its exact local URL. Its fragment carries private bootstrap access. The frontend removes that fragment before exchanging it for an HttpOnly, SameSite cookie. Keep the readiness record and URL private.
 
@@ -44,8 +71,8 @@ The Book-fixed source captures Escape and Tab while the book is open and restore
 
 ## Asset and retirement boundaries
 
-The retained knight model and reference derivative remain local candidate assets. The operator identified Void Shepherd by DarkPaperVerse under Fab Standard License and approved its local project-rendering use. Its raw model pair is supplied separately and excluded from source distribution; see GRAPHICAL_RELEASE.md. The reference derivative carries its own attribution and transformation record. Public asset admission and hosting require separate decisions.
+The detailed Round Table uses project-authored procedural knights and does not load a separate knight model. Earlier local candidates used Void Shepherd by DarkPaperVerse under Fab Standard License; the retained notice and asset manifest document that historical use. The production build copies only that notice from the historical model folder, even if other files remain there locally. The separately attributed reference derivative has its own transformation record. Public asset admission and hosting require separate decisions.
 
 Follow the campaign owner record to stop only the owned browser, server, tunnel, model, and fixture. Retain source, state, audit records, failures, and exact artifact identities. Retirement grants no automatic deletion or reset authority.
 
-The licensed local model pair is a required prerequisite: the existing loader has no missing-asset fallback. Source-only checkout rendering without that prerequisite is not qualified.
+The lightweight illustrated view also avoids loading the detailed 3D scene.

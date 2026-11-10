@@ -40,6 +40,12 @@ button:disabled { cursor: default; opacity: .5; }
 .stage > footer { padding: .6rem clamp(1rem, 2.4vw, 2.3rem); }
 .dashboard { width: min(100%, 80rem); }
 .dashboard-card .ledger-page { min-height: 21rem; }
+.operator-workflow { margin-top: .8rem; padding-top: .7rem; border-top: 1px solid #a88152; }
+.operator-workflow form, .workflow-actions { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
+.operator-workflow input { min-width: 0; max-width: 18rem; padding: .48rem; border: 1px solid #76513a; border-radius: .25rem; background: #fff8e8; color: #342418; }
+.operator-workflow button { padding: .48rem .7rem; border: 1px solid #76513a; border-radius: .25rem; background: #503321; color: #fff4dd; cursor: pointer; }
+.operator-workflow button:disabled { opacity: .55; cursor: not-allowed; }
+.operator-workflow button:focus-visible, .operator-workflow input:focus-visible { outline: 3px solid #157f83; outline-offset: 2px; }
 @media (max-width: 1100px) {
   .stage > header { align-items: flex-start; }
   .council-toolbar { max-width: 70%; }
@@ -60,3 +66,5 @@ button:disabled { cursor: default; opacity: .5; }
   .speaker-bubble { max-height: 24vh; }
   .book-dialog { max-height: calc(100% - .8rem); bottom: .4rem; }
 }
+.seat-workspace-link { color: #edcf88; padding: 10px 12px; border: 1px solid #71613f; border-radius: 6px; text-decoration: none; }
+.seat-workspace-link:focus-visible { outline: 2px solid #edcf88; outline-offset: 3px; }

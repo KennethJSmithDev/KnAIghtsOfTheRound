@@ -77,7 +77,16 @@ Set sc=$SYSTEM.OBJ.Load("/tmp/ipm-installer.xml","ck")
 Do $SYSTEM.Status.DisplayError(sc)
 ```
 
-Build an application archive from a clean checkout using Python 3.9 or later. The builder includes the exact application source, module descriptor, LICENSE and NOTICE, and preserves existing output files.
+Install the published twelve-class core from the public registry. A fresh IPM 0.10.9 client may have no repository configured; in that case, first add the official remote repository with publishing disabled:
+
+```objectscript
+zpm "repo -r -n kotr-public -url https://pm.community.intersystems.com/ -publish 0 -enable"
+zpm "install knaights-of-the-round"
+```
+
+The independently tested public artifact is version `0.1.0`, 3,263,062 bytes, SHA-256 `e9d99f49e660b6398047d58e050285a1796ba8f0b915032270ba715ba10d88ad`. It contains twelve application classes plus repository documentation/assets; it is a different archive representation from the curated local TGZ below. Its fifteen core source/descriptor/license/notice inputs match the reviewed core exactly. [Registry metadata](https://pm.community.intersystems.com/packages/knaights-of-the-round) and [public archive](https://pm.community.intersystems.com/download/knaights-of-the-round/-/knaights-of-the-round-0.1.0.tgz) identify the actual package.
+
+Alternatively, build the curated twelve-class core archive from a clean checkout using Python 3.9 or later. The builder includes those core sources, module descriptor, LICENSE and NOTICE, and preserves existing output files. It does not package the expanded optional profiles.
 
 ```powershell
 python scripts/package-ipm.py .local/knaights-of-the-round-0.1.0.tgz
@@ -98,7 +107,7 @@ Do $SYSTEM.Status.DisplayError(sc)
 Write ##class(KnAIghts.Review.App).Status().%ToJSON()
 ```
 
-Run `scripts/test-synthetic.script` and independently check its responses against the audit records. For source development, IPM also accepts `load /path/to/clean-checkout -v`. After a container restart, start the production explicitly again.
+Run `scripts/test-synthetic.script` and independently check its responses against the audit records. Use the public registry package or curated core archive for this qualified path; loading the expanded checkout is not the qualified twelve-class distribution. After a container restart, start the production explicitly again.
 
 Before uninstalling, stop the owned KnAIghts production. Confirm it is the active production in your dedicated namespace before calling the stop method.
 
@@ -187,8 +196,11 @@ The public source includes this scope summary. Exact logs, credentials, transcri
 | Negative authorization and proposal controls | Wrong credentials and an unauthorized case were denied. A forced selection against mismatched evidence was rejected. |
 | Standalone native model route, November 7 | PASS in a fresh isolated candidate fixture. Two `%AI.Agent` submissions, four provider completions, one ReadEvidence tool call per case, accepted matching selection and mismatch review. Independent persisted audit and two message-route sessions matched. Graceful production/container stop, exit 0, no OOM. |
 | Deterministic trusted-proposal regression, November 7 | PASS for matching selection, mismatch review, forced selection rejection, unsupported citation rejection, H000 admission denial and exact audit readback. |
-| IPM installation | PASS with client 0.10.9 on Build 154 for source load, exact-source TGZ installation, explicit production start, synthetic tests and audit readback, restart persistence, uninstall and same-artifact reinstall. Registry publication remains pending. Other runtime builds are unverified. |
+| IPM installation | PASS with client 0.10.9 on Build 154 for the existing local core archive and actual public-registry installation of 0.1.0. The public twelve-class core compiled, started explicitly, passed controlled synthetic review/task controls and independent native audit/message readback, preserved state across normal restart, and passed non-destructive uninstall/public-registry reinstall. Fresh client repository configuration was required. No model/provider call was made in that public-package test. Other builds and the complete 58-class integrated distribution remain unqualified. |
 | Synthetic task contract | Sequential proposal, approval, revised evidence, stale-approval rejection, one task update and duplicate receipt reconciliation passed. Authenticated restricted-user denial, lock timeout, changed evidence, bounded serialization-failure rollback and same-artifact reinstall passed separately. A bounded two-worker first-execution test returned one execution and one duplicate response with the same receipt; broader load behavior is unqualified. |
+| Browser/native review | A fresh browser-triggered mismatch was checked against independent native audit/message records. The first reload/reconnect assertion remained partial because the case returned to its default; a separate zero-inference check explicitly reselected the mismatch and verified recovery. |
+| Optional connected Workflow/PEX/vector | A local browser/native mismatch → real worklist → advisory six-feature vector/Java PEX context → authorized review → adapter notice → Book/dashboard sequence passed its scoped checks. This is separate from synthetic task approval/execution. |
+| Optional accounts and health | Actual local ChatGPT sign-in and two direct seat reviews retain their separate qualification. The optional health profile adds authenticated synthetic R4 reads, C-ECHO, MLLP/ACK and independently scoped viewer/MCP controls. See their dedicated guides. |
 | Source package | Application classes, configuration and these instructions. Graphical rehearsal and runtime evidence remain local. |
 
 This entry is qualified on AI Hub Community Build 154. Organizers also permit Build 109, but that does not establish this application's compatibility. Portal access to the declared Community image is an operator prerequisite. Qualification remains attached to the recorded fixture and source snapshots. These documentation instructions require a fresh installation run for a new environment.
@@ -197,4 +209,4 @@ The native agent and authenticated MCP integrations have separate test coverage.
 
 ## Integrated source package boundary
 
-For this integrated local candidate, use scripts/package-ipm.py to obtain the qualified twelve-class core TGZ. Folder import of the additional LiveSession classes is a different fourteen-class inventory and has not received that IPM lifecycle qualification. The optional graphical client and its separately licensed asset prerequisite are described in GRAPHICAL_RELEASE.md.
+The default `scripts/package-ipm.py` still builds the separately qualified twelve-class core archive. A historical fourteen-class archive containing the two LiveSession classes passed local install, restart, uninstall and same-artifact reinstall. Those results do not qualify a newly built artifact or the larger optional source inventory. The Workflow/PEX/vector, provider/MCP, health and account/seat profiles retain their own source and test scopes; no complete integrated IPM bundle is claimed. See [graphical distribution](GRAPHICAL_RELEASE.md), [health controls](HEALTH-CONTROLS.md) and [seats](SEATS-LOCAL.md) for their optional setup and limitations.

@@ -27,7 +27,7 @@ The [task guide](SYNTHETIC-TASK.md) explains the revision and duplicate safeguar
 
 A retained qualification contains three real outcomes: audit 1 was a provider failure, audit 2 was an accepted decision, and audit 3 was a review decision. They remain immutable evidence of those attempts, not universal IDs to hardcode into a judge's installation. A fresh run must report its own IDs.
 
-A recording or retained result is labeled as such. A LIVE request is described as new inference only when it actually invokes the model. Read-only refreshes are not new agent execution. The optional local Round Table can present retained IRIS evidence, but is not part of this core distribution. Its model assets and graphical release require separate public admission.
+A recording or retained result is labeled as such. A LIVE request is described as new inference only when it actually invokes the model. Read-only refreshes are not new agent execution. The optional local Round Table can present retained IRIS evidence, but is not part of this core distribution. Its graphical source and reference assets require separate public admission.
 
 ## What this release does not claim
 

@@ -1,0 +1,18 @@
+// Run once in a fresh, explicitly owned fixture. Never replace an existing user,
+// role, application or gateway in a shared instance.
+Set sc=##class(Security.Resources).Create("KnAIghtsWorkflowUse","Local synthetic Workflow operator","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(Security.Roles).Create("KnAIghtsWorkflowUser","Restricted local Workflow operator","KnAIghtsWorkflowUse:U,%DB_USER:R,%DB_IRISLIB:R,%DB_ENSLIB:R,%DB_HSLIB:R,%DB_IRISTEMP:RW","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=##class(Security.Roles).Create("KnAIghtsWorkflowPersistence","Workflow application persistence only","%DB_USER:RW","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set file=##class(%Stream.FileCharacter).%New(),file.Filename="/run/knaights/operator-password.txt"
+Set p("Roles")="KnAIghtsWorkflowUser",p("Password")=$ZStrip(file.Read(),"<>W"),p("Enabled")=1,p("ChangePassword")=0,p("NameSpace")="USER"
+Set sc=##class(Security.Users).Create("knaights_operator",.p)
+Kill p,file
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set p("NameSpace")="USER",p("DispatchClass")="KnAIghts.Context.OperatorApi",p("Enabled")=1,p("Type")=2,p("AutheEnabled")=32,p("Resource")="KnAIghtsWorkflowUse",p("MatchRoles")="KnAIghtsWorkflowUser:KnAIghtsWorkflowPersistence"
+Set sc=##class(Security.Applications).Create("/knaights-operator",.p)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"CONTEXT_SECURITY_OK",!
+Halt

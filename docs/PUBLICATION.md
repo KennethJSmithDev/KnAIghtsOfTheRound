@@ -1,6 +1,6 @@
 # Contest publication checklist
 
-The 2026 AI Agents in Interoperability Workflows contest closes submissions on November 8 at 11:59 PM EST. Open Exchange submission and public IPM registry activation are maintainer actions.
+The organizer stated a submission deadline of November 8, 2026 at 11:59 PM EST. Check the actual entry's acknowledgment and current organizer controls separately from repository maintenance. Open Exchange submission and public IPM registry activation are maintainer actions.
 
 ## Prepare the listing
 
@@ -8,7 +8,7 @@ The 2026 AI Agents in Interoperability Workflows contest closes submissions on N
 - Record the intended source commit with `git rev-parse HEAD` and confirm its public README describes that source.
 - Use `assets/brand/kotr-logo.png` as the supplied project artwork.
 - Link the [judge walkthrough](JUDGE-WALKTHROUGH.md), [installation guide](INTEROPERABILITY.md), and [synthetic task guide](SYNTHETIC-TASK.md).
-- Describe the shipped native AI Hub and optional authenticated Codex MCP workflows. Mark the Round Table interface as planned development.
+- Describe the native AI Hub and optional authenticated Codex MCP workflows at their qualified scopes. The Round Table, procedural graphics and local interfaces are implemented optional source profiles; distinguish them from recorded replay, the static simulation and future distribution work.
 - State the supported Build 154 image and existing local `gpt-oss:20b` requirement. Other runtime builds and broad concurrency/load behavior remain unqualified; the bounded two-worker duplicate-effect check passed.
 
 ## Submit through Open Exchange

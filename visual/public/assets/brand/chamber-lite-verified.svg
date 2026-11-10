@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" role="img" aria-labelledby="scene-title scene-desc" preserveAspectRatio="xMidYMid slice">
+              <title id="scene-title">The Round Table</title><desc id="scene-desc">A stylized chamber with three council seats, a round table, an evidence projection, and a book.</desc>
+              <defs>
+                <linearGradient id="room" x2="0" y2="1"><stop stop-color="#14191b"/><stop offset="1" stop-color="#221b18"/></linearGradient>
+                <linearGradient id="wall" x2="0" y2="1"><stop stop-color="#313131"/><stop offset="1" stop-color="#161b1c"/></linearGradient>
+                <linearGradient id="table" x2="0" y2="1"><stop stop-color="#8d5c3b"/><stop offset=".62" stop-color="#4d2e24"/><stop offset="1" stop-color="#251916"/></linearGradient>
+                <linearGradient id="helm" x2="1" y2="1"><stop stop-color="#d4d6c9"/><stop offset=".47" stop-color="#737d7a"/><stop offset="1" stop-color="#323e3d"/></linearGradient>
+                <linearGradient id="light" x2="0" y2="1"><stop stop-color="#8ef0e2" stop-opacity=".65"/><stop offset="1" stop-color="#51bdba" stop-opacity=".04"/></linearGradient>
+                <symbol id="knight" viewBox="0 0 140 205">
+                  <path d="M20 200v-71Q20 108 40 99l14-6h32l14 6q20 9 20 30v71Z" fill="#252a29" stroke="#8c765c" stroke-width="3"/>
+                  <path d="M26 139 7 115l25-21 31 18-8 35Zm88 0 19-24-25-21-31 18 8 35Z" fill="url(#helm)" stroke="#242c2c" stroke-width="4"/>
+                  <path d="M47 103q23 11 46 0l11 17-9 63H45l-9-63Z" fill="#555f5b" stroke="#d1b075" stroke-width="2"/>
+                  <path d="m70 112 18 12-5 35-13 13-13-13-5-35Z" fill="#333e3c" stroke="#b59b72" stroke-width="2"/>
+                  <path d="M45 38q0-31 25-31t25 31v31q-5 20-25 26Q50 89 45 69Z" fill="url(#helm)" stroke="#1b2424" stroke-width="4"/>
+                  <path d="M46 48h48M70 12v75M53 59l13 4m21-4-13 4" fill="none" stroke="#293535" stroke-width="4"/>
+                </symbol>
+              </defs>
+              <rect width="1000" height="600" fill="url(#room)"/>
+              <path d="M0 0h1000v370H0z" fill="url(#wall)"/>
+              <path d="M0 348 500 260l500 88v252H0Z" fill="#1b1c1b"/>
+              <path d="M0 426 500 295l500 131M0 530 500 300l500 230M170 600 500 303l330 297" fill="none" stroke="#4e4034" stroke-width="3" opacity=".48"/>
+              <path d="M34 0h80v318l-80 23Zm852 0h80v341l-80-23ZM289 0h43v271l-43 8Zm379 0h43v279l-43-8Z" fill="#272c2b" stroke="#4e4940" stroke-width="3"/>
+              <path d="M130 30h122v220H130zm618 0h122v220H748zM361 18h278v165H361z" fill="#101718" stroke="#574a37" stroke-width="6"/>
+              <path d="M190 31v219M130 105h122M809 31v219M748 105h122M500 18v165M361 100h278" fill="none" stroke="#43453e" stroke-width="4"/>
+              <path d="M0 334 500 251l500 83" fill="none" stroke="#b68a52" stroke-width="3" opacity=".55"/>
+              <g opacity=".85"><path d="M153 198v-38m-8 39h16M847 198v-38m-8 39h16" stroke="#c7a36c" stroke-width="5"/><path d="M153 151c-14-16 0-23 0-31 0 8 14 15 0 31m694 0c-14-16 0-23 0-31 0 8 14 15 0 31" fill="#dcad6f"/></g>
+              <g transform="translate(170 150) scale(.9)"><use href="#knight" width="140" height="205"/></g>
+              <g transform="translate(430 91) scale(1.03)"><use href="#knight" width="140" height="205"/></g>
+              <g transform="translate(690 150) scale(.9)"><use href="#knight" width="140" height="205"/></g>
+              <path d="M186 364q314-112 628 0l-23 87q-291 108-582 0Z" fill="#2b1b17" stroke="#9a7048" stroke-width="5"/>
+              <ellipse cx="500" cy="361" rx="335" ry="118" fill="url(#table)" stroke="#d0a16a" stroke-width="7"/>
+              <ellipse cx="500" cy="359" rx="301" ry="91" fill="none" stroke="#c79a65" stroke-width="2" opacity=".7"/>
+              <path d="M234 359h530M500 269v181" stroke="#d7ab78" stroke-width="1" opacity=".19"/>
+              <g class="projector"><ellipse cx="500" cy="365" rx="94" ry="25" fill="#1a2c2b" stroke="#76c6b6" stroke-width="3"/><ellipse cx="500" cy="362" rx="75" ry="18" fill="#5fc4b5" opacity=".16"/><path d="M438 357 469 191h62l31 166Z" fill="url(#light)"/><path class="selection-marker" d="M500 201 530 254 500 287 470 254Z" fill="#8be1d5" opacity=".65" stroke="#d3fff0" stroke-width="2"/><path class="selection-marker" d="M500 201v86m-30-33h60" stroke="#effff7" stroke-width="1.5" opacity=".8"/></g>
+              <g transform="translate(544 435) rotate(-7)"><path d="M0 0h146v74H0Z" fill="#311d19" stroke="#d4ab6f" stroke-width="3"/><path d="M7 7h132v59H7Z" fill="#63382a" stroke="#c39560"/><path d="M73 13v47" stroke="#d2a873"/><text x="73" y="31" text-anchor="middle" fill="#f2d5a2" font-family="Georgia,serif" font-size="8" letter-spacing="1">BOOK OF</text><text x="73" y="44" text-anchor="middle" fill="#f2d5a2" font-family="Georgia,serif" font-size="11" letter-spacing="1">RECEIPTS</text></g>
+              <path d="M0 600v-51l126-71 90 122Zm1000 0v-51l-126-71-90 122Z" fill="#291e1a" stroke="#8b6745" stroke-width="6"/>
+            </svg>

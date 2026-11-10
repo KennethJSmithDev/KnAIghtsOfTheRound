@@ -1,0 +1,4 @@
+Set rows=##class(%SQL.Statement).%ExecDirect(,"GRANT SELECT ON KnAIghtsVector.CaseV1 TO KnAIghtsSeatReader")
+If rows.%SQLCODE<0 { Write rows.%Message,! Halt }
+Write !,"KOTR_VECTOR_READ_GRANTED",!
+Halt

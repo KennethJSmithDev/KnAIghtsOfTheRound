@@ -1,0 +1,13 @@
+[mcp]
+transport = "stdio"
+
+[[iris]]
+name = "knaights"
+server = {host="127.0.0.1",port=1972,username="CSPSystem",password="<private-bridge-password>"}
+pool = {min=1,max=2}
+endpoints = [{path="/mcp/knaights-options",username="knaights_codex",password="<private-seat-password>"}]
+
+[logging]
+level = "warn"
+output = "file"
+file = "/tmp/kotr-options-mcp.log"

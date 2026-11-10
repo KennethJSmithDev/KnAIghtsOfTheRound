@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "sources": {
+    "synthetic-dicom-file": {
+      "dataClass": "synthetic",
+      "kind": "dicom-file",
+      "path": "/run/knaights-fixtures/synthetic.dcm",
+      "studyUID": "2.25.260001",
+      "seriesUID": "2.25.260002",
+      "sopUID": "2.25.260003"
+    },
+    "synthetic-dicomweb": {
+      "dataClass": "synthetic",
+      "kind": "dicomweb-metadata",
+      "baseUrl": "http://orthanc:8042/dicom-web",
+      "isolatedPlainHttp": true,
+      "studyUID": "2.25.260001",
+      "seriesUID": "2.25.260002",
+      "sopUID": "2.25.260003"
+    },
+    "synthetic-fhir-study": {
+      "dataClass": "synthetic",
+      "kind": "fhir-resource",
+      "baseUrl": "https://your-approved-synthetic-fhir.example/fhir",
+      "fhirVersion": "5.0.0",
+      "resourceType": "ImagingStudy",
+      "resourceId": "synthetic-study",
+      "studyUID": "2.25.260001",
+      "auth": {"kind": "bearer", "env": "KOTR_SYNTHETIC_FHIR_TOKEN"}
+    },
+    "synthetic-oru": {
+      "dataClass": "synthetic",
+      "kind": "hl7-v2",
+      "path": "/run/knaights-fixtures/synthetic.hl7",
+      "profile": "2.5:ORU_R01"
+    }
+  }
+}

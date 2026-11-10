@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import fixture from './rehearsal.json';
+import {WorkflowPanel} from './Workflow.jsx';
 
 const caseIds = ['synthetic-a', 'synthetic-b'];
 const titles = {'synthetic-a': 'Matching sources', 'synthetic-b': 'Source mismatch'};
@@ -18,9 +19,9 @@ const lines = {
   },
 };
 
-// Each tool step follows the sealed trace order. A ruling is a separate
-// presentation beat for that submit's verified audit response, as checked by
-// prepare-rehearsal.py. Recheck both cases if the projection changes.
+// Replay keeps the fixture's event order. Each recorded submit response is
+// presented as a separate ruling beat, not a new audit or inference.
+// Recheck both cases if this projection changes.
 const steps = fixture.events.flatMap(event => {
   if (!event.response) return [{...event, kind: 'read', seat: 'codex'}];
   return [
@@ -126,7 +127,7 @@ export function Ledger({session}) {
         {live && <dl className="ledger-facts"><dt>IRIS session</dt><dd>{session.run.interop.sessionId}</dd>
           <dt>Message</dt><dd>{session.run.interop.requestHeaderId} → {session.run.interop.responseHeaderId}</dd></dl>}
       </> : <p>{live ? 'The validated response, citations and persisted audit identity appear here after service verification.' : 'The recorded decision, citations, and audit ID appear here when the council reaches its ruling.'}</p>}
-      {live && <section className="operator-task" data-task-state={task?.available ? task.status : 'UNAVAILABLE'}>
+      {live && <section className="operator-task" data-task-state={task?.status || 'UNAVAILABLE'}>
         <h4>Operator task · separate authority</h4>
         {task?.available ? <dl className="ledger-facts">
           <dt>Task state</dt><dd>{task.status}</dd>
@@ -134,9 +135,10 @@ export function Ledger({session}) {
           <dt>Proposed by</dt><dd>{task.proposedBy || 'Not recorded'}</dd>
           <dt>Approval</dt><dd>{task.approval?.approvalId ? `${task.approval.approvedBy} · ${task.approval.approvalId}` : 'Awaiting explicit operator approval'}</dd>
           {task.execution?.operationId && <><dt>Execution</dt><dd>{task.execution.operationId} · {task.execution.executedBy}</dd></>}
-        </dl> : <p>Operator task state is unavailable. Source acceptance alone grants no task approval.</p>}
+        </dl> : <p>{task?.status === 'NOT_CREATED' ? 'No separate operator task has been created.' : 'The separate operator task state could not be retrieved.'} Source acceptance alone grants no task approval.</p>}
         <p className="source-note">Task changes remain authenticated operator operations. This view reads their actual state.</p>
       </section>}
+      {live && <WorkflowPanel session={session} />}
     </section>
   </div>;
 }

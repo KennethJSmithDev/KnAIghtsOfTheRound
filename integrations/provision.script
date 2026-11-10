@@ -1,0 +1,9 @@
+Set sc=##class(Security.Applications).Get("/knaights-live",.p)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+If ($Get(p("Resource"))'="KnAIghtsSeatUse")!($Get(p("MatchRoles"))'="KnAIghtsSeatReader:KnAIghtsSeatMessage") { Write "Unexpected seat grants",! Halt }
+Kill p
+Set p("NameSpace")="USER",p("DispatchClass")="KnAIghts.Integration.MCP",p("Enabled")=1,p("Type")=18,p("AutheEnabled")=32,p("Resource")="KnAIghtsSeatUse",p("MatchRoles")="KnAIghtsSeatReader:KnAIghtsSeatMessage"
+Set sc=##class(Security.Applications).Create("/mcp/knaights-options",.p)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"KOTR_INTEGRATION_APP_OK",!
+Halt

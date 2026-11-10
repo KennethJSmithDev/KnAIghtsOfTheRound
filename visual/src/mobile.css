@@ -1,0 +1,35 @@
+/* A static, source-safe chamber avoids a WebGL context and large character asset
+   on compact/touch screens. Detailed 3D is still available on explicit request. */
+.lightweight-chamber,.chamber-loading{width:100%;height:100%;min-height:0;background:#181b1a}
+.lightweight-chamber img{display:block;width:100%;height:100%;object-fit:cover}
+.chamber-loading{display:grid;place-items:center;color:#ebd4b0;font-size:.9rem}
+.speaker-bubble.light-bubble{visibility:visible;left:1rem;top:4rem;transform:none;width:min(21rem,70vw)}
+.speaker-bubble.light-bubble::after{display:none}
+@media(max-width:760px){
+  .stage{height:100svh;min-height:0;grid-template-rows:auto minmax(0,1fr) auto}
+  .stage>header{display:block;padding:.45rem .65rem}
+  .identity{gap:.5rem;margin-bottom:.35rem}
+  .identity .seal{width:2.2rem;height:2.2rem}
+  .identity h1{font-size:1.05rem}.identity .overline{font-size:.55rem}
+  .council-toolbar{display:flex;flex-wrap:nowrap;justify-content:flex-start;max-width:100%;width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:#8c6a48 #211718}
+  .council-toolbar nav,.council-toolbar>button{flex:none}
+  .council-toolbar button{min-height:44px;padding:.4rem .6rem;font-size:.75rem}
+  .council-toolbar button.run-rehearsal{order:-1}
+  .stage>footer{display:flex;flex-direction:row;align-items:center;gap:.4rem;padding:.35rem .65rem max(.35rem,env(safe-area-inset-bottom));font-size:.65rem}
+  .session-state{max-width:50%;font-size:.65rem;line-height:1.25}
+  .case-switch{justify-content:flex-end}.case-switch button{min-height:44px;padding:.3rem .45rem;font-size:.68rem}
+  .projection-tools{top:.45rem;left:.45rem;gap:.25rem}.projection-mode{font-size:.7rem}
+  .projection-tools button{min-height:44px;font-size:.68rem}
+  .speaker-bubble.light-bubble{top:3.7rem;left:.6rem;width:min(19rem,68vw)}
+  .book-backdrop{position:fixed;inset:0;background:#0a0b10a0}
+  .book-dialog{position:fixed;left:.5rem;right:.5rem;top:max(.5rem,env(safe-area-inset-top));bottom:max(.5rem,env(safe-area-inset-bottom));width:auto;max-height:none;transform:none}
+  .book-close{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){.lightweight-chamber *, .lightweight-chamber *::before, .lightweight-chamber *::after{animation:none!important;transition:none!important}}
+.seal svg{display:block;width:80%;height:80%;fill:#302923;stroke:#d3ac73;stroke-width:2}
+@media(max-width:760px){
+  .stage{width:100%;min-width:0;grid-template-columns:minmax(0,1fr)}
+  .stage>header,.stage>footer,.council-toolbar{min-width:0;max-width:100%}
+}
+
+.viewport.book-open{z-index:10}

@@ -1,0 +1,6 @@
+Set sc=##class(Ens.Director).GetProductionStatus(.name,.state)
+If $SYSTEM.Status.IsError(sc) Halt
+If $Get(name)'="KnAIghts.Seats.Production" Halt
+If +$Get(state)'=1 Halt
+Write !,"KOTR_SEAT_HEALTHY",!
+Halt

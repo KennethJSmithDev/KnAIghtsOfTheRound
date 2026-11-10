@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {useRehearsal} from './Rehearsal.jsx';
+import {useWorkflow} from './Workflow.jsx';
 
 const cases = ['synthetic-a', 'synthetic-b'];
 const references = ['ImagingStudy/example-ct', 'ImagingSelection/example-segment'];
@@ -195,10 +196,12 @@ export function useSession() {
   const [mode, setMode] = useState('live');
   const replay = useRehearsal();
   const live = useLiveSession();
+  const workflow = useWorkflow(live.run, Boolean(live.snapshot?.runtime?.contextLive));
   const selected = mode === 'live' ? live : replay;
   return {
     ...selected,
     mode,
+    workflow: mode === 'live' ? workflow : null,
     sourceVerified: mode === 'live' ? live.sourceVerified : replay.approved,
     setMode(next) { if (!selected.running) setMode(next); },
   };

@@ -1,9 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {BufferAttribute, BufferGeometry} from 'three';
 
-// The C002 Task 2 N32 HRA right ovary capture uses eight little-endian
-// floats per vertex: position vec4 followed by normal vec4. Its independently
-// checked output and source attribution are pinned to this single fixture.
+// The retained HRA right-ovary fixture uses eight little-endian floats per
+// vertex: position vec4 followed by normal vec4. Check its size and digest
+// before converting it into a display projection; retain its source attribution.
 const fixture = Object.freeze({
   url: `${import.meta.env.BASE_URL}assets/nrx-reference/VH_F_right_ovary-N32.bin`,
   sha256: '4359bae3d1b35404f478a5b5a4c91798e29aebbf0f2799e0f969d4f5be1654d5',

@@ -1,0 +1,14 @@
+**
+!Dockerfile.pex
+!src/
+!src/**
+src/KnAIghts/DICOM3D/
+!pex/
+!pex/java/
+!pex/java/**
+!docker/
+!docker/bootstrap.sh
+!docker/bootstrap.script
+!docker/secure-bootstrap.sh
+!LICENSE
+!NOTICE

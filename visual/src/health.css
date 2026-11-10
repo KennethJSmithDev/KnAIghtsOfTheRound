@@ -1,0 +1,11 @@
+.health-dialog { width: min(760px, calc(100vw - 24px)); max-height: 88dvh; box-sizing: border-box; overflow: auto; padding: 24px; color: #e5eaf1; background: #111b25; border: 1px solid #9d803d; border-radius: 12px; }
+.health-dialog::backdrop { background: #050a10b8; }
+.health-heading, .health-actions { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.health-dialog label { display: grid; gap: 8px; margin: 18px 0; }
+.health-dialog input, .health-dialog select { min-width: 0; width: 100%; box-sizing: border-box; padding: 12px; color: #e5eaf1; background: #172a36; border: 1px solid #577285; border-radius: 5px; font: inherit; }
+.health-dialog button { min-height: 44px; }
+.health-receipt pre, .book-health-receipt pre { overflow: auto; max-height: 280px; padding: 12px; background: #08121c; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.health-dialog code, .book-health-receipt code { overflow-wrap: anywhere; }
+.health-error { color: #ffc5a6; }
+.book-health-receipt { margin-top: 24px; padding-top: 18px; border-top: 1px solid #577285; }
+@media (max-width: 600px) { .health-dialog { padding: 16px; } .health-actions { flex-wrap: wrap; } .health-actions button { flex: 1 1 180px; } }

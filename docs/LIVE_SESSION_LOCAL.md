@@ -65,6 +65,10 @@ The owned `/knaights-live` CSP/REST application uses vendor Type 2. Its only rou
 
 The sidecar accepts at most two native submissions, one at a time. Repeating the same request ID returns the retained result without inference; reusing that ID for another case is rejected. Unknown cases, arbitrary fields and malformed IDs are rejected before inference. A usable projection requires the exact native audit, response body and corresponding Interoperability request/response headers. The returned session ID is the actual Interoperability session, not an audit ordinal. The private retained response candidate is never returned as accepted.
 
+The separately configured [context-live profile](CONTEXT-LIVE.md) adds an
+operator-only application for the synthetic Workflow/PEX/vector demonstration.
+It does not grant operator authority to the two routes above.
+
 The isolated Compose profile has `network_mode: none`; the explicit Desktop host profile uses its verified owned ordinary bridge. Both retain no published ports and the same bounded memory/CPU/logs. Build 154's vendor password-bootstrap compatibility alias is created only inside this fresh container. Original vendor utility bytes remain unchanged. No shared namespace, service or network is reconfigured.
 
 The optional visual server and fixed-destination tunnel use the same state directory; see [the visual launch instructions](VISUAL_LOCAL.md). The browser server receives only the restricted IRIS credential. It has no Docker access. The separately owned tunnel supplies IRIS transport without publishing a container port. Never publish the state directory or its secrets.
@@ -83,4 +87,4 @@ This profile is a local qualification surface. A successful build or HTTP respon
 
 ## Source asset prerequisite
 
-See GRAPHICAL_RELEASE.md before building: Fab model files are separately licensed and intentionally excluded from source distribution. Supplying them locally preserves the accepted rendering path; it does not admit a built dist for public redistribution.
+The current detailed scene uses project-authored procedural knights and does not require the separately licensed Fab model used in earlier local candidates. Historical asset notices remain in the source. The reference derivative has its own attribution; a local build does not by itself establish public redistribution rights.

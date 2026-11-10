@@ -1,33 +1,59 @@
-# Optional Round Table source candidate
+# Optional Round Table source profile
 
-This local release candidate retains the accepted Arthur camera, table/chairs, knight seats, Book of Receipts, projector, shared dashboard, recorded rehearsal and failed-history recovery. Core publication ef8acd47 is separate; this new integrated candidate has not been pushed or deployed.
+The optional graphical client presents a shared case ledger through the Round
+Table, dashboard and Book of Receipts. The detailed view uses project-authored
+procedural knights, armor and robes. The lightweight illustrated view avoids the
+detailed scene on compact/touch screens unless the user requests it.
 
-## Distribution arrangement
+## Source and assets
 
-The prospective source archive includes the graphical source, exact dependency lock and required notices. It excludes Fab scene.gltf/scene.bin, node_modules, dist, model weights, vendor images, credentials and private receipts. The retained local Fab pair remains ignored in the working directory. Private visual Git history is not merged.
+The current scene does not require the separately licensed Fab knight model.
+Preserve the legacy asset notice and private visual history; they do not grant
+redistribution rights for standalone model files. The source distribution excludes
+model weights, vendor images, credentials, private receipts, dependencies and
+compiled output. Vite copies files from its public directory even when Git ignores
+them, so inspect the actual build before proposing any compiled distribution.
 
-Acquire Void Shepherd by DarkPaperVerse through Fab under the applicable Fab Standard License. Copy your own licensed qualified scene.gltf and scene.bin into visual/public/assets/void-shepherd/. Compare them against VISUAL_ASSETS.json. The accepted converted pair is the qualified visual prerequisite; another conversion is unverified. No model download or public model route is supplied by this package.
+The HRA reference derivative retains its attribution, CC BY 4.0 notice, source
+identity and interpretation limits. React, ReactDOM, Three.js and React Three
+Fiber retain their separate dependency terms. Preserve the source lock and required
+notices in any distribution.
 
-The Fab asset is rendered only. Generative tools receive authorized synthetic facts, not its files, pixels or geometry. Fab NoAI restrictions are preserved. Do not treat project-use permission as a right to redistribute standalone model files. Vite's public-directory copy includes ignored files in dist: do not upload that build merely because git status excludes the model.
+## Local use
 
-## Local preparation
+Use Node ^20.19 or >=22.12 and the exact `visual/package-lock.json`:
 
-Use Node ^20.19 or >=22.12 and the exact visual/package-lock.json. With the licensed files supplied, run npm --prefix visual ci --ignore-scripts --no-audit --no-fund, then npm --prefix visual run build. An offline install requires an existing complete cache. Build failures or missing assets are blockers, not evidence of visual success.
+```powershell
+npm --prefix visual ci --ignore-scripts --no-audit --no-fund
+npm --prefix visual run build
+```
 
-Follow LIVE_SESSION_LOCAL.md for an owned Build154 fixture and authenticated session transport, and VISUAL_LOCAL.md for the separate tunnel/broker. Credentials stay server-side. Keep host loopback binding and finite resource admission. The profile starts with read-only session access; native inference requires an explicit request and a separately approved allowance.
+Follow [local graphical setup](VISUAL_LOCAL.md) and the
+[live-session guide](LIVE_SESSION_LOCAL.md) for the authenticated local transport.
+The browser broker keeps IRIS credentials on the server. Native inference requires
+an explicit request and separately admitted model access. The
+[connected review profile](CONTEXT-LIVE.md) and [health controls](HEALTH-CONTROLS.md)
+use separate permissions and state; a health observation does not validate a case.
 
-## Package boundaries and qualification
+The [static interactive simulation](../demo/README.md) is an independent browser
+experience with disclosed synthetic outcomes. Recorded rehearsal is also labeled.
+Neither is a native IRIS execution or provider call.
 
-scripts/package-ipm.py builds the qualified twelve-class core TGZ. It does not install the graphical interface or the two LiveSession classes. Do not substitute folder-based IPM loading of this integrated fourteen-class source for the qualified core TGZ and claim that lifecycle is covered.
+## Qualification and package boundaries
 
-Graphical source and reference bytes are unchanged from the accepted local recovery candidate. Existing qualifications remain scoped: native source selection and review, operator task/concurrency, shared live snapshot, failed-history recovery, Book focus/replay/teardown. No new inference/browser witness occurred in RELEASE008. Original audit1 remains provider failure, audit2 accepted, audit3 review; audit3 remains service-only, not newly browser-ledger-qualified.
+Local browser checks cover procedural/lightweight presentation, Book interaction,
+shared case state and separately qualified native health-source controls. Physical
+phone heat, battery use, GPU memory and broad load remain unmeasured. A render or
+screenshot does not establish native inference.
 
-A fresh browser-triggered mismatch needs a fresh synthetic fixture, exact provider admission, a real native call and independent message/audit readback. It is not replaced by recorded playback. No fresh call is necessary for this packaging reconciliation, so zero calls are authorized here. That remaining witness is a separate proposed finite gate.
+Fresh native mismatch execution and independent audit/message readback were
+qualified separately. The initial reload check returned to the default case and
+remained partial; a separate zero-inference recovery check reselected the mismatch.
+These records do not turn a recorded replay or mock-snapshot screenshot into fresh
+inference. Distinct fixtures may reuse an audit number; preserve fixture identity.
 
-## Attribution
-
-Void Shepherd has its own ASSET_NOTICE.md and Fab license; it is not covered by the project Apache license. The unchanged HRA reference derivative retains ATTRIBUTION.txt, CC BY4.0, source identities and transformation/clinical limitations. React, ReactDOM, Three.js and React Three Fiber are separately licensed dependencies; the source lock retains exact versions/licenses. No node_modules or compiled third-party bundle is redistributed in the source archive. A future compiled distribution must retain the required third-party notices.
-
-## Judge presentation
-
-Use the public core judge walkthrough for native execution and separate task approval/execution. Use the local recorded evidence packet for authentic retained outcomes, prominently labeled RECORDED. The private accepted graphical witness can illustrate the interface; it must not be described as a fresh model execution or an online interactive demo. The graphical client is optional to core installation.
+The default builder emits the qualified twelve-class core archive. A historical
+fourteen-class LiveSession artifact passed its own local lifecycle checks. Neither
+result establishes a complete package for every optional source profile, a public
+registry installation, Pages deployment or contest submission. See the
+[package boundary](INTEROPERABILITY.md#integrated-source-package-boundary).

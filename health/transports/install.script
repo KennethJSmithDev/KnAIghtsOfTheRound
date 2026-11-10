@@ -1,0 +1,4 @@
+Set sc=$SYSTEM.OBJ.LoadDir("/opt/knaights/health/transports","ck",.errors,1)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Write !,"KOTR_HEALTH_TRANSPORT_CLASSES_OK",!
+Halt

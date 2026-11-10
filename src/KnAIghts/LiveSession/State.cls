@@ -7,12 +7,27 @@ ClassMethod Allowed() As %Boolean [ Private ]
     Quit ($ZConvert($USERNAME,"L")="knaights_codex") && $SYSTEM.Security.Check("KnAIghtsSeatUse","U") && ('$SYSTEM.Security.Check("%Admin_Operate","U"))
 }
 
+/// Context production is an explicit live-session profile. Keep its status
+/// projection here so the qualified core review class and its package bytes do
+/// not change. An unrelated running production never becomes an admitted one.
+ClassMethod RuntimeStatus() As %DynamicObject [ Private ]
+{
+    Set result=##class(KnAIghts.Review.App).Status(),contextLive=0
+    If $SYSTEM.Util.GetEnviron("KNAIGHTS_CONTEXT_LIVE")="1" {
+        Set sc=##class(Ens.Director).GetProductionStatus(.name,.state)
+        If $SYSTEM.Status.IsOK(sc),$Get(name)="KnAIghts.Context.Production",+$Get(state)=1 Set contextLive=1
+    }
+    If contextLive Do result.%Set("running",1,"boolean")
+    Do result.%Set("contextLive",contextLive,"boolean")
+    Quit result
+}
+
 ClassMethod Snapshot() As %DynamicObject
 {
     If '..Allowed() Quit {"status":"DENIED"}
     Set result={"apiVersion":1,"status":"OK"}, caller={}
     Do caller.%Set("principal",$USERNAME),caller.%Set("operatorUse",$SYSTEM.Security.Check("%Admin_Operate","U"),"boolean")
-    Do result.%Set("caller",caller),result.%Set("runtime",##class(KnAIghts.Review.App).Status())
+    Do result.%Set("caller",caller),result.%Set("runtime",..RuntimeStatus())
     Set runs=[]
     Lock +^KnAIghtsLiveSession("ledger"):2
     If '$Test Quit {"status":"BUSY"}
@@ -37,7 +52,7 @@ ClassMethod TaskProjection() As %DynamicObject [ Private ]
 {
     Lock +^KnAIghtsSyntheticTask:2
     If '$Test Quit {"available":false,"status":"BUSY"}
-    Set result={"available":false}
+    Set result={"available":false,"status":"NOT_CREATED"}
     Try {
         Set raw=$Get(^KnAIghtsSyntheticTask("synthetic-review-001"))
         If raw'="" {
@@ -90,7 +105,7 @@ ClassMethod Run(caseId As %String, requestId As %String) As %DynamicObject
                 Set result={"status":"STORED"}
             }
         } Else {
-            Set status=##class(KnAIghts.Review.App).Status()
+            Set status=..RuntimeStatus()
             If status.%Get("running"),status.%Get("liveEnabled") Set result=..Invoke(caseId,requestId)
         }
     } Catch exception {

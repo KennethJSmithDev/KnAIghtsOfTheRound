@@ -1,0 +1,9 @@
+For resource="KnAIghtsSeatUse","KnAIghtsSeatPropose","KnAIghtsSeatWorker" { If '##class(Security.Resources).Exists(resource) { Set sc=##class(Security.Resources).Create(resource,"KotR local seat workspace","") If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt } } }
+Set db="%DB_USER:RW,%DB_IRISLIB:R,%DB_ENSLIB:R,%DB_IRISTEMP:RW"
+For role="KotRSeatReviewer","KotRSeatObserver","KotRSeatWorker" { Set grants=db_$Select(role="KotRSeatWorker":",KnAIghtsSeatWorker:U",role="KotRSeatReviewer":",KnAIghtsSeatUse:U,KnAIghtsSeatPropose:U",1:",KnAIghtsSeatUse:U") Set sc=##class(Security.Roles).Create(role,"KotR local seat workspace",grants,"") If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt } }
+Set p("NameSpace")="USER",p("DispatchClass")="KnAIghts.Seats.Api",p("Enabled")=1,p("Type")=2,p("AutheEnabled")=32
+Set sc=##class(Security.Applications).Create("/kotr-seats",.p)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Kill p,db
+Write !,"KOTR_SEAT_RESOURCES_OK",!
+Halt
