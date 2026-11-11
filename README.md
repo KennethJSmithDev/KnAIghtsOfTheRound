@@ -33,6 +33,8 @@ Built for the **InterSystems AI Agents in Interoperability Workflows contest**, 
 
 <p align="center"><sub>Actual local application capture with original procedural knights. The displayed matching result is a retained synthetic snapshot served by a mock API; this image does not show fresh IRIS inference.</sub></p>
 
+**Explore without installing:** [Interactive simulation](https://kennethjsmithdev.github.io/KnAIghtsOfTheRound/) · [Media gallery](https://kennethjsmithdev.github.io/KnAIghtsOfTheRound/media/). The simulation replays two synthetic outcomes. The native workflow runs locally in IRIS.
+
 ## Features
 
 - Agent-assisted review of authorized evidence.
@@ -59,7 +61,7 @@ Both demonstration cases use the same `KnAIghtsEntry → AssessEvidence` product
 
 Explore the implementation: [production](src/KnAIghts/Review/Production.cls), [review and validation](src/KnAIghts/Review/Operation.cls), [authorized evidence tool](src/KnAIghts/Review/Tools.cls), and [operator task](src/KnAIghts/Review/SyntheticTask.cls).
 
-Clients can build on this shared review boundary. DICOM3D is the first planned domain adapter. This local integrated candidate retains the optional dashboard and Round Table source. The default IPM builder produces the core package; the Workflow, PEX, and vector prototypes are not yet packaged. See [local graphical setup](docs/VISUAL_LOCAL.md) and the [local PEX and vector profile](docs/PEX-VECTOR.md).
+Clients can build on this shared review boundary. DICOM3D is the first planned domain adapter. The repository includes the optional dashboard and Round Table. The public IPM package supplies the twelve-class core. Workflow, PEX, and vector profiles have separate local setup, and the complete 58-class integrated distribution remains unbuilt and unqualified. See [local graphical setup](docs/VISUAL_LOCAL.md) and the [local PEX and vector profile](docs/PEX-VECTOR.md).
 
 ## Getting started
 

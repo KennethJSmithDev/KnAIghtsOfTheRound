@@ -33,9 +33,10 @@ source file is not proof of a complete install or combined deployment.
 - Follow the documented setup from a declared fresh environment using the exact
   source and vendor prerequisites a reviewer can obtain. Preserve meaningful
   success, refusal, recovery and authority checks.
-- Prepare genuine review media with source/capture provenance and privacy/rights
-  checks. Optional articles, video publication, Open Exchange and contest actions
-  remain separate operator-owned steps.
+- The [interactive simulation](https://kennethjsmithdev.github.io/KnAIghtsOfTheRound/) presents two recorded synthetic outcomes without a runtime connection. The [media gallery](https://kennethjsmithdev.github.io/KnAIghtsOfTheRound/media/) documents the origin and scope of retained captures.
+- Review rights, privacy, captions and playback before adding recordings. Optional
+  articles, video publication, Open Exchange and contest actions remain separate
+  operator-owned steps.
 
 ## Planned interoperability expansion
 
