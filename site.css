@@ -18,6 +18,8 @@
 .intro{max-width:63ch;font-size:1.05rem;color:#d8c9b7}
 .media-main section{margin-top:2rem}
 .media-main section>p{max-width:80ch;color:#d8c9b7}
+.walkthrough-video{display:block;width:100%;height:auto;background:#171311;border:1px solid #62503d;border-radius:.65rem}
+.walkthrough-video:focus-visible{outline:3px solid #9dded2;outline-offset:3px}
 .capture-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
 .capture{min-width:0;margin:0;overflow:hidden;background:#211d1a;border:1px solid #62503d;border-radius:.65rem}
 .capture-image{display:block;background:#171311}
