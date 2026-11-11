@@ -158,3 +158,9 @@ See the [development tracks](docs/ROADMAP.md) for contest delivery and the post-
 Contributions through issues, testing, documentation, and focused changes are welcome. Describe the intended behavior and evidence needed to verify a change.
 
 KnAIghts is licensed under the [Apache License 2.0](LICENSE). The review production pattern is adapted from DICOM3D. Preserve the attribution in [NOTICE](NOTICE). InterSystems IRIS for Health, client software, and model runtimes are separately supplied under their respective terms.
+
+## Development transparency
+
+This project is developed through human-directed, AI-assisted collaboration. AI assistants, including ChatGPT and OpenAI Codex, contribute to research, design, code, tests, documentation, and reviews. Some project materials are AI-generated or substantially AI-assisted; they are not represented as exclusively human-authored.
+
+Kenneth J. Smith directs the project, decides what is accepted and published, and takes responsibility for its releases. Functionality and verification claims are limited to the evidence documented for the relevant version. This disclosure does not replace individual contributor credits, dependency licenses, or third-party attribution.
