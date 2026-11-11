@@ -80,5 +80,21 @@
       "renderer": "Headless browser 151.0.7922.34, authenticated IRIS health-source API",
       "sourceIdentity": "Qualified health viewer source at ddcb5d3 with the reviewed implementation additions"
     }
-  ]
+  ],
+  "video": {
+    "file": "assets/kotr-public-simulation-walkthrough.webm",
+    "title": "KotR public simulation walkthrough",
+    "captureType": "Recorded browser walkthrough of the public simulation and media gallery",
+    "capturedAtUtc": "2026-11-11T06:35:18.877Z",
+    "sourcePagesCommit": "74f0ba83e492216a10f8e63c54935af1f352cf1b",
+    "sourceURL": "https://kennethjsmithdev.github.io/KnAIghtsOfTheRound/",
+    "durationSeconds": 62.3,
+    "width": 1440,
+    "height": 1004,
+    "bytes": 4645056,
+    "sha256": "240be2ec3458a079d4351b762f1329b1da630689476b83326038282b862e58a8",
+    "audio": "Silent",
+    "captions": "On-screen editorial captions",
+    "scope": "The simulation replays recorded synthetic outcomes. The gallery segment shows retained IRIS health-source observations from separate tests."
+  }
 }
