@@ -1,0 +1,33 @@
+/* Presentation shared by the demo navigation and gallery. */
+.surface-nav,.capture-links{display:flex;flex-wrap:wrap;gap:.25rem 1rem}
+.surface-nav a,.capture-links a,.media-footer a{display:inline-flex;align-items:center;min-height:44px;color:#edd5ad;text-underline-offset:.2em}
+.footer{flex-wrap:wrap}
+.footer .surface-nav{flex-basis:100%}
+.media-page{margin:0;background:#141211;color:#eee1cf;font:1rem/1.55 system-ui,sans-serif}
+.media-page *{box-sizing:border-box}
+.media-page a:focus-visible,.surface-nav a:focus-visible{outline:3px solid #9dded2;outline-offset:3px}
+.media-page a{color:#edd5ad}
+.media-header,.media-footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.5rem 1.25rem;padding:.55rem max(1rem,calc((100% - 70rem)/2));background:#1b1917}
+.media-header{border-bottom:1px solid #534537}
+.media-footer{border-top:1px solid #534537}
+.media-brand{display:inline-flex;align-items:center;min-height:44px;font:700 1.1rem Georgia,serif;text-decoration:none}
+.media-main{max-width:72rem;margin:auto;padding:clamp(1rem,4vw,2.25rem) 1rem 3rem}
+.media-main h1,.media-main h2,.capture h3{margin:0;font-family:Georgia,serif;line-height:1.2}
+.media-main h1{font-size:clamp(2.35rem,6vw,3.7rem)}
+.media-main h2{font-size:clamp(1.55rem,4vw,2.1rem);margin-bottom:.6rem}
+.intro{max-width:63ch;font-size:1.05rem;color:#d8c9b7}
+.media-main section{margin-top:2rem}
+.media-main section>p{max-width:80ch;color:#d8c9b7}
+.capture-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.capture{min-width:0;margin:0;overflow:hidden;background:#211d1a;border:1px solid #62503d;border-radius:.65rem}
+.capture-image{display:block;background:#171311}
+.capture-image:focus-visible{outline-offset:-4px!important}
+.capture img{display:block;width:100%;height:auto;max-height:34rem;object-fit:contain}
+.capture figcaption{padding:.9rem 1rem .45rem}
+.capture h3{font-size:1.3rem}
+.capture figcaption p{margin:.45rem 0}
+.capture-type,.capture-meta{color:#c8b89f;font-size:.84rem}
+.capture-type{font-weight:650}
+.skip-link{position:absolute;left:1rem;top:-10rem;background:#211d1a;padding:.75rem;z-index:2}
+.skip-link:focus{top:1rem}
+@media(max-width:640px){.capture-grid{grid-template-columns:1fr}.media-header{gap:0}.media-header .surface-nav{font-size:.85rem}.media-main section{margin-top:1.5rem}}
