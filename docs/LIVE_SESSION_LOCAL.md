@@ -4,12 +4,21 @@ This optional qualification profile uses the existing native Build 154 agent and
 
 Prerequisites are Docker Compose, Python 3, an already available supported Community Build 154 image and the separately authorized local `gpt-oss:20b` provider. The application provider setting remains `KNAIGHTS_PROVIDER_BASE_URL`. The default isolated profile uses container loopback and requires a separately supplied reachable provider there. The explicit Docker Desktop host profile below uses the stock host service directly and supplies no custom provider relay.
 
-Create an owner JSON containing a campaign name, finite UTC `deadlineUtc`, resource allowance, protected environments and retirement condition. Choose a fresh state directory and a unique Compose project/image. The helper refuses an existing state directory and never overwrites retained fixture evidence.
+Create `.local/owner.json` with a campaign name and a future UTC deadline. Replace the placeholder with an ISO 8601 timestamp ending in `+00:00`.
+
+```json
+{
+  "campaign": "kotr-local-demo",
+  "deadlineUtc": "REPLACE_WITH_FUTURE_UTC_TIMESTAMP"
+}
+```
+
+Record the resource allowance, protected environments and retirement condition for your fixture. Choose a fresh state directory and a unique Compose project/image. The helper refuses an existing state directory to preserve retained fixture evidence.
 
 From a fresh checkout, substitute these values:
 
 ```powershell
-python scripts/live-session.py prepare --state .local/session --owner PATH_TO_APPROVED_OWNER.json --project knaights-local-native --app-image knaights-local-native:private --iris-image ALREADY_PRESENT_PINNED_BUILD154_IMAGE
+python scripts/live-session.py prepare --state .local/session --owner .local/owner.json --project knaights-local-native --app-image knaights-local-native:private --iris-image ALREADY_PRESENT_PINNED_BUILD154_IMAGE
 
 docker compose --env-file .local/session/compose.env -p knaights-local-native -f compose.qualification.yaml build
 docker compose --env-file .local/session/compose.env -p knaights-local-native -f compose.qualification.yaml up -d
@@ -39,11 +48,11 @@ Record the actual listener address, owning process and model identity. Test meta
 Create a dedicated ordinary bridge with the campaign's exact owner label, or use one already created and independently recorded for this campaign. Inspect existing network/subnet usage first. If address pools are exhausted, choose an explicitly approved unused subnet; never prune another project's networks. Docker must not replace an existing network implicitly.
 
 ```powershell
-$owner = Get-Content -Raw PATH_TO_APPROVED_OWNER.json | ConvertFrom-Json
+$owner = Get-Content -Raw .local/owner.json | ConvertFrom-Json
 docker network create --driver bridge --label "org.kotr.owner=$($owner.campaign)" knaights-local-provider
 $networkId = docker network inspect --format '{{.Id}}' knaights-local-provider
 
-python scripts/live-session.py prepare --state .local/session --owner PATH_TO_APPROVED_OWNER.json --project knaights-local-native --app-image knaights-local-native:private --iris-image ALREADY_PRESENT_PINNED_BUILD154_IMAGE --provider-profile desktop-host --provider-url http://host.docker.internal:53567/v1 --provider-network-name knaights-local-provider --provider-network-id $networkId
+python scripts/live-session.py prepare --state .local/session --owner .local/owner.json --project knaights-local-native --app-image knaights-local-native:private --iris-image ALREADY_PRESENT_PINNED_BUILD154_IMAGE --provider-profile desktop-host --provider-url http://host.docker.internal:53567/v1 --provider-network-name knaights-local-provider --provider-network-id $networkId
 ```
 
 Then run the same Compose build/up and provision commands above. The helper records the profile and verifies the exact network name, full ID, bridge driver, ordinary/non-internal status and owner label. Each later fixture check also requires one matching attachment and no published ports. The canonical host URL is admitted only by the explicit `desktop-host` helper profile; the isolated helper profile continues to admit only its container-loopback URL.

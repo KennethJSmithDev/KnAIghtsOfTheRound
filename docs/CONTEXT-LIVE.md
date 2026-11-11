@@ -25,13 +25,14 @@ Docker Desktop host-provider bridge has ordinary outbound connectivity; it is
 not a host-only or fully isolated network. Use synthetic data only.
 
 Build the opt-in image and the frontend. Substitute your already-present image
-and a unique local image name. The frontend install uses the existing npm cache.
+and a unique local image name. The frontend install requires npm registry access.
+With a complete cache for the selected platform, add `--offline` to `npm ci`.
 
 ```powershell
 docker build --pull=false -f Dockerfile.pex `
   --build-arg IRIS_IMAGE=ALREADY_PRESENT_BUILD154_IMAGE `
   -t knaights-context-live:private .
-npm --prefix visual ci --offline --ignore-scripts --no-audit --no-fund
+npm --prefix visual ci --ignore-scripts --no-audit --no-fund
 npm --prefix visual run build
 ```
 

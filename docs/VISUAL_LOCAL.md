@@ -1,6 +1,6 @@
-# Optional local visual candidate
+# Optional local viewer
 
-This private candidate packages the retained Book-fixed Round Table interface as an optional `visual/` frontend. It uses the existing Arthur camera, table, chairs, projector, Book of Receipts, dashboard, replay fixture, and accepted live-session controller. The application source and the private runtime state have separate ownership.
+The public repository includes an optional `visual/` frontend with the Round Table, Book of Receipts, dashboard, recorded replay, and authenticated live-session view. Keep runtime state in the ignored `.local/` directory.
 
 ## Local tool storage
 
@@ -33,14 +33,14 @@ a matching owned environment rather than making another checkout or model copy.
 
 Use Node.js compatible with `^20.19.0 || >=22.12.0` and npm. The local preparation used Node 24.21.0 and npm 11.19.0. Direct dependencies are pinned to Three 0.180.0, React 19.2.7, React DOM 19.2.7, React Three Fiber 9.6.1, and Vite 8.2.4. The portable lock retains the exact existing dependency versions and integrity values.
 
-From a fresh checkout of this private source identity, install dependencies and build the frontend.
+From a fresh checkout, install the locked frontend dependencies with npm registry access, then build the frontend.
 
 ```powershell
-npm --prefix visual ci --offline --ignore-scripts --no-audit --no-fund
+npm --prefix visual ci --ignore-scripts --no-audit --no-fund
 npm --prefix visual run build
 ```
 
-The offline command requires a complete npm cache for the selected platform. Local preparation verified the SHA-512 content of all 33 Windows x64-eligible cached package tarballs. A new installation can use `npm --prefix visual ci --ignore-scripts --no-audit --no-fund` with registry access to acquire the same locked packages. These commands acquire frontend dependencies, with the IRIS vendor image and inference model supplied separately.
+With a complete npm cache for the selected platform, add `--offline` to the install command. Obtain the IRIS vendor image and inference model separately for live use.
 
 The frontend has its own package manifest and lock. The frontend build and combined runtime have separate qualification results.
 
@@ -67,7 +67,7 @@ Verify actual caller identity, runtime version, request ID, case, source facts, 
 
 Source acceptance, operator approval, and task execution are distinct. Browser task state is read-only. Operator actions remain behind the authenticated task API. The recorded rehearsal retains its own mode label and never represents a new native inference.
 
-The Book-fixed source captures Escape and Tab while the book is open and restores focus to its connected opening control. Its prior qualification and this fresh-checkout witness must retain their separate source identities. Browser startup and application-server startup are separate operations. Use the campaign's approved headed Edge session and capture the actual served build.
+While the Book is open, verify that Tab stays within the dialog, Escape closes it, and focus returns to the opening control when it is still available. Record the source and build identity for any new observation.
 
 ## Asset and retirement boundaries
 

@@ -4,6 +4,9 @@ KotR's native agent proposes an evidence-based action; IRIS owns source validati
 dispositions and audit. Optional interfaces and interoperability profiles build on
 that boundary without granting approval or execution authority implicitly.
 
+Capability development is paused while the project focuses on documentation,
+articles and authentic demonstrations.
+
 ## Available at recorded local scopes
 
 | Capability | Implemented outcome | Qualification boundary |
@@ -22,12 +25,11 @@ source file is not proof of a complete install or combined deployment.
 
 ## Distribution and qualification work
 
-- Reconcile an explicit integrated package profile with the intended class,
-  Python, Java and schema inventory, preserving the default core package identity
-  and bytes. Qualify that exact artifact through installation, restart, uninstall
-  and same-artifact reinstall before claiming parity.
-- Verify the actual public package after operator-controlled registry activation.
-  Local lifecycle evidence does not establish registry availability.
+- Public IPM 0.1.0 passed registry installation and lifecycle checks for its
+  twelve-class synthetic core on Build 154 with IPM 0.10.9. See the
+  [qualification summary](INTEROPERABILITY.md#qualification-evidence).
+- The complete 58-class integrated IPM package remains unbuilt and unqualified.
+  Its distribution and lifecycle qualification are deferred during the freeze.
 - Follow the documented setup from a declared fresh environment using the exact
   source and vendor prerequisites a reviewer can obtain. Preserve meaningful
   success, refusal, recovery and authority checks.
@@ -37,9 +39,10 @@ source file is not proof of a complete install or combined deployment.
 
 ## Planned interoperability expansion
 
-Add native DIMSE C-FIND and separately negotiated retrieval/storage paths; broader
-HL7 ADT, ORM/OMI, amendment and MDM semantics; and independently qualified R5 and
-SMART/OAuth repository profiles. Preserve each source's identifiers, versions,
+This work is deferred during the freeze. Possible DIMSE additions include native
+C-FIND and separately negotiated retrieval and storage. Other directions include
+broader HL7 ADT, ORM/OMI, amendment and MDM semantics and independently qualified
+R5 and SMART/OAuth repository profiles. Preserve each source's identifiers, versions,
 transport outcome and original evidence. Patient/image/report relationships need
 explicit source evidence rather than text similarity.
 
