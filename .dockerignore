@@ -1,11 +1,12 @@
 **
 !Dockerfile
-!src/
-!src/**
-!docker/
-!docker/bootstrap.sh
-!docker/bootstrap.script
-src/KnAIghts/DICOM3D/
+!.dockerignore
 !LICENSE
 !NOTICE
-!docker/secure-bootstrap.sh
+!THIRD_PARTY_NOTICES.md
+!demo/
+# Admitting the parent must not admit future demo files implicitly.
+demo/**
+!demo/index.html
+!demo/demo.css
+!demo/demo.js
