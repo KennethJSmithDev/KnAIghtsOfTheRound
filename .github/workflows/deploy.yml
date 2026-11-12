@@ -1,0 +1,32 @@
+name: Dev Cloud Deploy
+
+on:
+  push:
+    branches: [cloud-demo]
+    paths: [.github/workflows/deploy.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kotr-cloud-demo-deployment
+  cancel-in-progress: false
+
+jobs:
+  register:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Register manual deployment
+        run: echo "Deployment is available by manual dispatch on cloud-demo."
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/cloud-demo'
+    uses: intersystems-community/cloud-deployment/.github/workflows/deployment.yml@87d550158fd37b20c90c73de233ff90e73406e1c
+    with:
+      name: kotr
+      port: 8080
+    secrets:
+      SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
