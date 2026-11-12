@@ -24,9 +24,97 @@ jobs:
 
   deploy:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/cloud-demo'
-    uses: intersystems-community/cloud-deployment/.github/workflows/deployment.yml@87d550158fd37b20c90c73de233ff90e73406e1c
-    with:
-      name: kotr
-      port: 8080
-    secrets:
-      SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PROJECT_ID: iris-community-demos
+      CLUSTER_NAME: demo
+      REGION: europe-west2
+      NAMESPACE: dev-cloud-workload
+      IMAGE_REPOSITORY: europe-west2-docker.pkg.dev/iris-community-demos/community/kotr
+      # Reuse the NGINX image from the successful cloud-demo build.
+      IMAGE_TAG: 5e5b28c858633c983ebf9b31be44426ca5ce94f5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Google Authentication
+        uses: google-github-actions/auth@v3.0.0
+        with:
+          credentials_json: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v3.0.0
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          cluster_name: ${{ env.CLUSTER_NAME }}
+          location: ${{ env.REGION }}
+      - name: Prepare NGINX chart adaptation
+        shell: bash
+        run: |
+          set -euo pipefail
+          chart="$RUNNER_TEMP/iris-app-0.0.4.tgz"
+          curl --fail --silent --show-error --location --max-time 30 \
+            https://charts.demo.community.intersystems.com/charts/iris-app-0.0.4.tgz -o "$chart"
+          printf '%s  %s\n' 2cee10485f5b312cfaf75e7bda15f7dda82523ab579ae07aeae4d76556577508 "$chart" | sha256sum --check
+          # Adapt only this release's application container; retain its other resources.
+          cat > "$RUNNER_TEMP/kotr-nginx-render" <<'RENDERER'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          work=$(mktemp -d "$RUNNER_TEMP/kotr-nginx.XXXXXX")
+          trap 'rm -f -- "$work/resources.yaml" "$work/kustomization.yaml"; rmdir -- "$work"' EXIT
+          cat > "$work/resources.yaml"
+          cat > "$work/kustomization.yaml" <<'PATCH'
+          apiVersion: kustomize.config.k8s.io/v1beta1
+          kind: Kustomization
+          resources: [resources.yaml]
+          patches:
+            - patch: |-
+                apiVersion: apps/v1
+                kind: StatefulSet
+                metadata:
+                  name: kotr-iris-app
+                spec:
+                  template:
+                    spec:
+                      containers:
+                        - name: iris-app
+                          args: null
+                          startupProbe:
+                            exec: null
+                            httpGet: {path: /healthz, port: web}
+                          readinessProbe:
+                            exec: null
+                            httpGet: {path: /healthz, port: web}
+                          livenessProbe:
+                            exec: null
+                            httpGet: {path: /healthz, port: web}
+          PATCH
+          kubectl kustomize "$work"
+          RENDERER
+          chmod +x "$RUNNER_TEMP/kotr-nginx-render"
+      - name: Deploy existing NGINX image
+        shell: bash
+        run: |
+          set -euo pipefail
+          helm upgrade --install kotr "$RUNNER_TEMP/iris-app-0.0.4.tgz" \
+            --namespace "$NAMESPACE" \
+            --set-string image.repository="$IMAGE_REPOSITORY" \
+            --set-string image.tag="$IMAGE_TAG" \
+            --set resources.limits.memory=1Gi \
+            --set service.webPort=8080 \
+            --set replicas=1 \
+            --set ingress.name=kotr \
+            --set ingress.domain=kotr.sandbox.developer.intersystems.com \
+            --set-string 'extraEnv[0].name=GITHUB_REPO' \
+            --set-string "extraEnv[0].value=$GITHUB_REPOSITORY" \
+            --post-renderer "$RUNNER_TEMP/kotr-nginx-render" \
+            --wait --atomic --timeout 10m
+      - name: Verify running demo
+        shell: bash
+        run: |
+          set -euo pipefail
+          state=$(kubectl --namespace "$NAMESPACE" get statefulset kotr-iris-app -o 'jsonpath={.spec.replicas}:{.status.readyReplicas}')
+          test "$state" = '1:1'
+          health=$(curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-max-time 90 \
+            --retry-all-errors --connect-timeout 5 --max-time 10 \
+            https://kotr.sandbox.developer.intersystems.com/healthz)
+          test "$health" = 'ok'
