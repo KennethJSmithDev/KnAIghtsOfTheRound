@@ -1,0 +1,56 @@
+{
+  "resourceType": "CapabilityStatement",
+  "status": "active",
+  "date": "2026-11-11",
+  "kind": "instance",
+  "fhirVersion": "5.0.0",
+  "format": [
+    "application/fhir+json"
+  ],
+  "implementation": {
+    "description": "KotR synthetic R5 documentation fixture",
+    "url": "https://source.example.invalid/fhir/r5"
+  },
+  "rest": [
+    {
+      "mode": "server",
+      "resource": [
+        {
+          "type": "ImagingStudy",
+          "interaction": [
+            {
+              "code": "read"
+            }
+          ]
+        },
+        {
+          "type": "ImagingSelection",
+          "interaction": [
+            {
+              "code": "read"
+            }
+          ]
+        },
+        {
+          "type": "Observation",
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "search-type"
+            }
+          ]
+        },
+        {
+          "type": "Provenance",
+          "interaction": [
+            {
+              "code": "create"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

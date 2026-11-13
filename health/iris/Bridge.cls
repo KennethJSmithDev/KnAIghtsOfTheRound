@@ -38,6 +38,9 @@ ClassMethod HL7Text(digest As %String) As %String
 
 ClassMethod HL7From(digest As %String, archive As %String) As %String [ Language = python, Private ]
 {
+    import sys
+    if "/opt/knaights/health" not in sys.path:
+        sys.path.append("/opt/knaights/health")
     import kotr_health
     return kotr_health.archived_hl7(digest, archive)
 }

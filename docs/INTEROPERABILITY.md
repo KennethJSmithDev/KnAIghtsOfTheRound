@@ -196,11 +196,11 @@ The public source includes this scope summary. Exact logs, credentials, transcri
 | Negative authorization and proposal controls | Wrong credentials and an unauthorized case were denied. A forced selection against mismatched evidence was rejected. |
 | Standalone native model route, November 7 | PASS in a fresh isolated candidate fixture. Two `%AI.Agent` submissions, four provider completions, one ReadEvidence tool call per case, accepted matching selection and mismatch review. Independent persisted audit and two message-route sessions matched. Graceful production/container stop, exit 0, no OOM. |
 | Deterministic trusted-proposal regression, November 7 | PASS for matching selection, mismatch review, forced selection rejection, unsupported citation rejection, H000 admission denial and exact audit readback. |
-| IPM installation | PASS with client 0.10.9 on Build 154 for the existing local core archive and actual public-registry installation of 0.1.0. The public twelve-class core compiled, started explicitly, passed controlled synthetic review/task controls and independent native audit/message readback, preserved state across normal restart, and passed non-destructive uninstall/public-registry reinstall. Fresh client repository configuration was required. No model/provider call was made in that public-package test. Other builds and the complete 58-class integrated distribution remain unqualified. |
+| IPM installation | PASS with client 0.10.9 on Build 154 for the existing local core archive and actual public-registry installation of 0.1.0. The public twelve-class core compiled, started explicitly, passed controlled synthetic review/task controls and independent native audit/message readback, preserved state across normal restart, and passed non-destructive uninstall/public-registry reinstall. Fresh client repository configuration was required. No model/provider call was made in that public-package test. The opt-in 59-class integrated profile has separate local Build 154 qualification for installation, synthetic runtime checks, restart and uninstall/reinstall. Runtime dependencies require explicit provisioning and production start. Other builds remain unverified. |
 | Synthetic task contract | Sequential proposal, approval, revised evidence, stale-approval rejection, one task update and duplicate receipt reconciliation passed. Authenticated restricted-user denial, lock timeout, changed evidence, bounded serialization-failure rollback and same-artifact reinstall passed separately. A bounded two-worker first-execution test returned one execution and one duplicate response with the same receipt; broader load behavior is unqualified. |
 | Browser/native review | A fresh browser-triggered mismatch was checked against independent native audit/message records. The first reload/reconnect assertion remained partial because the case returned to its default; a separate zero-inference check explicitly reselected the mismatch and verified recovery. |
 | Optional connected Workflow/PEX/vector | A local browser/native mismatch → real worklist → advisory six-feature vector/Java PEX context → authorized review → adapter notice → Book/dashboard sequence passed its scoped checks. This is separate from synthetic task approval/execution. |
-| Optional accounts and health | Actual local ChatGPT sign-in and two direct seat reviews retain their separate qualification. The optional health profile adds authenticated synthetic R4 reads, C-ECHO, MLLP/ACK and independently scoped viewer/MCP controls. See their dedicated guides. |
+| Optional accounts and health | Actual local ChatGPT sign-in and two direct seat reviews retain their separate qualification. The [optional health profile](HEALTH-SOURCES.md) adds authenticated native synthetic R4 reads, C-ECHO, MLLP/ACK and independently scoped viewer/MCP controls. Separate native KotR/MCP checks read six R4B/R5 synthetic types per version through a local authenticated gateway to Candle. Fresh IRIS-hosted R4B/R5 repository reads remain unverified. |
 | Source package | Application classes, configuration and these instructions. Graphical rehearsal and runtime evidence remain local. |
 
 This entry is qualified on AI Hub Community Build 154. Organizers also permit Build 109, but that does not establish this application's compatibility. Portal access to the declared Community image is an operator prerequisite. Qualification remains attached to the recorded fixture and source snapshots. These documentation instructions require a fresh installation run for a new environment.
@@ -209,4 +209,34 @@ The native agent and authenticated MCP integrations have separate test coverage.
 
 ## Integrated source package boundary
 
-The default `scripts/package-ipm.py` still builds the separately qualified twelve-class core archive. A historical fourteen-class archive containing the two LiveSession classes passed local install, restart, uninstall and same-artifact reinstall. Those results do not qualify a newly built artifact or the larger optional source inventory. The Workflow/PEX/vector, provider/MCP, health and account/seat profiles retain their own source and test scopes; no complete integrated IPM bundle is claimed. See [graphical distribution](GRAPHICAL_RELEASE.md), [health controls](HEALTH-CONTROLS.md) and [seats](SEATS-LOCAL.md) for their optional setup and limitations.
+The default `scripts/package-ipm.py` still builds the separately qualified twelve-class core archive. A historical fourteen-class archive containing the two LiveSession classes passed local install, restart, uninstall and same-artifact reinstall. Those results do not qualify a newly built artifact or the larger optional source inventory. The opt-in integrated profile includes 59 classes and staged Java, Python and SQL inputs. Its local archive passed installation and lifecycle checks. The updated health parser and MLLP admission passed native FHIR, restricted MCP and transport checks from the installed archive. Unchanged Workflow/PEX/vector components retain their prior synthetic evidence. Each profile requires explicit runtime setup and production start. See [graphical distribution](GRAPHICAL_RELEASE.md), [health controls](HEALTH-CONTROLS.md) and [seats](SEATS-LOCAL.md) for their optional setup and limitations.
+
+## Opt-in integrated source profile
+
+The `0.2.0` source update preserves the public twelve-class IPM `0.1.0` package.
+`module.integrated.xml` defines a separate, local `0.1.0-local.1` profile with
+59 source classes and staged Java, Python and SQL inputs. Use a dedicated empty
+namespace: the two modules share class names and are not a side-by-side install.
+
+Create a private `.local` directory and supply the exact qualified project JAR
+and pydicom wheel before invoking the opt-in builder. The output must not exist.
+
+```powershell
+python -B scripts/package-ipm.py .local/kotr-integrated.tgz --profile integrated --pex-jar .local/knaights-pex.jar --pydicom-wheel .local/pydicom-3.0.2-py3-none-any.whl
+```
+
+The builder requires JAR SHA-256
+`3b74692e5b1414f047724737763827e1e10a7041b13c31a69da7f6f40bd2865a`
+and the wheel hash in [health/requirements.txt](../health/requirements.txt).
+The exact qualified JAR is separately supplied. `Dockerfile.pex` builds from the
+Java sources, but its output has not been established byte-identical to that
+pinned JAR. A fresh source checkout alone therefore does not establish exact
+integrated-archive reproduction.
+
+Installation stages files and compiles classes. The operator still provisions
+the Java gateway/vendor SDK, Python import paths and dependency, vector schema,
+private paths and restricted principals before explicitly starting a synthetic
+profile. Use the [PEX/vector](PEX-VECTOR.md), [Workflow](BONUS-WORKFLOW.md) and
+[health](HEALTH-SOURCES.md) setup guides. Graphical clients and provider accounts
+have separate setup. The engineering installer is not included in this source
+payload, and no public integrated registry release is claimed.

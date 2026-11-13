@@ -22,17 +22,56 @@ const sessions=new Map(),active=new Map(),cooldowns=new Map();let ticking=false,
 let bootstrap=config.bootstrapCredentials?randomBytes(32).toString('base64url'):null;
 const token=()=>randomBytes(32).toString('base64url');
 const journal=data=>appendFile(join(state,'events.jsonl'),JSON.stringify({at:new Date().toISOString(),...data})+'\n');
+function discardSession(session) {
+  session.active=false;
+  session.auth='';
+  session.allowedJobs.clear();
+  session.resumeQueued=false;
+  sessions.delete(session.id);
+}
+function expireSessions() {
+  for(const session of sessions.values()){
+    if(!session.active||session.expires<=Date.now())discardSession(session);
+  }
+}
 async function nativeCall(auth,op,args={}) {
   const response=await fetch(config.irisUrl+'/v1/'+(op==='identity'?'identity':'rpc'),{
     method:op==='identity'?'GET':'POST',headers:{Authorization:auth,'Content-Type':'application/json'},
     body:op==='identity'?undefined:JSON.stringify({op,args}),redirect:'error',signal:AbortSignal.timeout(50000)});
-  if(!response.ok)throw new Error('IRIS authentication or service unavailable.');
+  if(!response.ok){
+    const error=new Error('IRIS authentication or service unavailable.');
+    error.nativeStatus=response.status;
+    throw error;
+  }
   return boundedJson(response,1048576);
+}
+async function sessionCall(session,op,args={}) {
+  if(!session.active||session.expires<=Date.now()){
+    discardSession(session);
+    const error=new Error('IRIS session expired.');
+    error.nativeStatus=401;
+    throw error;
+  }
+  try {
+    const result=await nativeCall(session.auth,op,args);
+    if((op==='identity'||op==='state')&&result.status==='DENIED'){
+      discardSession(session);
+      const error=new Error('IRIS seat access denied.');
+      error.nativeStatus=401;
+      throw error;
+    }
+    return result;
+  }
+  catch(error){
+    if(error.nativeStatus===401||error.nativeStatus===403)discardSession(session);
+    throw error;
+  }
 }
 async function login(credentials,res) {
   if(typeof credentials.username!=='string'||typeof credentials.password!=='string'||credentials.username.length>128||credentials.password.length>256)throw new Error('Invalid credentials.');
   const auth=basic(credentials),identity=await nativeCall(auth,'identity');
   if(identity.status!=='OK'||typeof identity.principal!=='string')throw new Error('IRIS seat access denied.');
+  expireSessions();
   if(sessions.size>=16)throw new Error('Local session limit reached.');
   const id=token(),session={id,owner:identity.principal,canPropose:!!identity.canPropose,auth,active:true,allowedJobs:new Set(),resumeQueued:false,expires:Date.now()+3600000};
   sessions.set(id,session);res.setHeader('Set-Cookie',`kotr_seats=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=3600`);
@@ -54,7 +93,7 @@ async function runJob(session,job) {
       if(!(await models(account,job.connectionId)).some(m=>m.id===job.model))throw new Error('Model unavailable.');
       await account.accessToken();
     } else if(!config.localProvider)throw new Error('Local provider is not configured.');
-    let nonce=token();const allowed=await nativeCall(session.auth,'authorize',{jobId:job.id,nonce});
+    let nonce=token();const allowed=await sessionCall(session,'authorize',{jobId:job.id,nonce});
     if(allowed.status!=='OK')return;
     const claim=await nativeCall(workerAuth,'claim',{owner:session.owner,jobId:job.id,nonce,lease});
     if(claim.status!=='OK')return;
@@ -63,9 +102,9 @@ async function runJob(session,job) {
     const signal=AbortSignal.any([controller.signal,AbortSignal.timeout(90000)]);
     const result=job.provider==='chatgpt'?await inferChatGPT(account,job,signal):await inferLocal(config.localProvider,job,signal);
     if(!session.active||session.expires<Date.now()||signal.aborted)throw new Error('Session ended before finalization.');
-    nonce=token();const recheck=await nativeCall(session.auth,'authorize',{jobId:job.id,nonce});
+    nonce=token();const recheck=await sessionCall(session,'authorize',{jobId:job.id,nonce});
     if(recheck.status!=='OK')throw new Error('Seat permission is no longer available.');
-    const ruling=await nativeCall(session.auth,'finish',{jobId:job.id,nonce,lease,...result});
+    const ruling=await sessionCall(session,'finish',{jobId:job.id,nonce,lease,...result});
     await journal({event:'validation-returned',owner:session.owner,jobId:job.id,status:ruling.status,responseId:result.responseId,usage:result.usage});
   } catch {
     if(!controller.signal.aborted&&session.active)cooldowns.set(session.owner+'/'+job.connectionId,Date.now()+30000);
@@ -81,7 +120,7 @@ async function tick() {
     for(const session of sessions.values())if(session.active&&session.expires>Date.now()&&(session.resumeQueued||session.allowedJobs.size))owners.set(session.owner,session);
     for(const session of owners.values()){
       if(active.size>=4)break;
-      const view=await nativeCall(session.auth,'state');if(view.status!=='OK')continue;
+      const view=await sessionCall(session,'state');if(view.status!=='OK')continue;
       for(const job of view.jobs.filter(j=>j.state==='QUEUED'&&(session.resumeQueued||session.allowedJobs.has(j.id)))){
         if(active.size>=4)break;
         if(active.has(session.owner+'/'+job.id)||(cooldowns.get(session.owner+'/'+job.connectionId)??0)>Date.now())continue;
@@ -105,26 +144,29 @@ const server=createServer(async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
   res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
   if(req.headers.host!==`127.0.0.1:${address.port}`)return send(res,403,{error:'Local host required.'});
-  const url=new URL(req.url,origin);
+  let url;
+  try {
+  if(!req.url?.startsWith('/')||req.url.startsWith('//'))return send(res,400,{error:'Invalid local request target.'});
+  url=new URL(req.url,origin);
   if(req.method==='POST'&&url.pathname==='/shutdown'&&!req.headers.origin&&config.shutdownToken&&req.headers['x-kotr-stop']===config.shutdownToken){send(res,200,{stopping:true});void close();return}
   if(req.method==='GET'&&files.has(url.pathname)){
     const [name,type]=files.get(url.pathname);res.writeHead(200,{'Content-Type':type+'; charset=utf-8','Cache-Control':'no-store'});return res.end(await readFile(new URL('./web/'+name,import.meta.url)));
   }
   if(req.method==='POST'&&(req.headers.origin!==origin||req.headers['x-kotr-seats']!=='1'))return send(res,403,{error:'Use the local seat workspace.'});
-  try {
     if(req.method==='POST'&&url.pathname==='/api/login')return send(res,200,await login(await input(req),res));
     if(req.method==='POST'&&url.pathname==='/api/bootstrap'){
       const data=await input(req);if(!bootstrap||data.token!==bootstrap)return send(res,403,{error:'Invalid bootstrap link.'});
       bootstrap=null;const credentials=JSON.parse(await readFile(config.bootstrapCredentials,'utf8'));
       return send(res,200,await login(credentials,res));
     }
+    expireSessions();
     const id=(req.headers.cookie??'').split(';').map(s=>s.trim()).find(s=>s.startsWith('kotr_seats='))?.slice(11);
     const session=sessions.get(id);
     if(!session?.active||session.expires<Date.now())return send(res,401,{error:'Sign in to the IRIS seat workspace.'});
-    const identity=await nativeCall(session.auth,'identity');
-    if(identity.status!=='OK'||identity.principal!==session.owner){session.active=false;session.auth='';sessions.delete(id);res.setHeader('Set-Cookie','kotr_seats=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');return send(res,401,{error:'IRIS workspace access is no longer available.'})}
+    const identity=await sessionCall(session,'identity');
+    if(identity.status!=='OK'||identity.principal!==session.owner){discardSession(session);res.setHeader('Set-Cookie','kotr_seats=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');return send(res,401,{error:'IRIS workspace access is no longer available.'})}
     session.canPropose=!!identity.canPropose;
-    if(req.method==='GET'&&url.pathname==='/api/state')return send(res,200,{...await nativeCall(session.auth,'state'),accounts:vault.list(session.owner),canPropose:session.canPropose,schedulingEnabled:session.resumeQueued||session.allowedJobs.size>0,localProviderConfigured:!!config.localProvider});
+    if(req.method==='GET'&&url.pathname==='/api/state')return send(res,200,{...await sessionCall(session,'state'),accounts:vault.list(session.owner),canPropose:session.canPropose,schedulingEnabled:session.resumeQueued||session.allowedJobs.size>0,localProviderConfigured:!!config.localProvider});
     if(req.method==='GET'&&url.pathname==='/api/models'){
       const id=url.searchParams.get('id'),choices=id==='local'?(config.localProvider?await localModels(config.localProvider):[]):await models(vault.get(session.owner,id),id);
       return send(res,200,{models:choices,catalogMeasurement:id==='local'?null:catalogMeasurement(id)});
@@ -137,7 +179,7 @@ const server=createServer(async(req,res)=>{
       session.resumeQueued=data.enabled===true;return send(res,200,{enabled:session.resumeQueued});
     }
     if(url.pathname==='/api/logout'){
-      session.active=false;session.auth='';sessions.delete(id);
+      discardSession(session);
       for(const value of active.values())if(value.owner===session.owner)value.controller.abort();
       res.setHeader('Set-Cookie','kotr_seats=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');return send(res,200,{signedOut:true});
     }
@@ -151,14 +193,15 @@ const server=createServer(async(req,res)=>{
     if(url.pathname==='/api/rpc'){
       if(!publicOps.has(data.op))return send(res,403,{error:'Operation is not exposed to the browser.'});
       if(data.op==='connection'&&data.args.enabled)await checkConnection(session,data.args);
-      const result=await nativeCall(session.auth,data.op,data.args);
+      const result=await sessionCall(session,data.op,data.args);
       if(data.op==='cancel')active.get(session.owner+'/'+data.args.jobId)?.controller.abort();
       if(data.op==='enqueue'&&result.status==='OK'){session.allowedJobs.add(result.job.id);void tick()}
       return send(res,200,result);
     }
     return send(res,404,{error:'Unavailable.'});
   } catch(error) {
-    if(url.pathname==='/api/models')await journal({event:'catalog-error',name:error.name,causeCode:error.cause?.code??null,frames:String(error.stack??'').split('\n').slice(1,5)});
+    if(error.nativeStatus===401||error.nativeStatus===403){res.setHeader('Set-Cookie','kotr_seats=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');return send(res,401,{error:'Sign in to the IRIS seat workspace.'})}
+    if(url?.pathname==='/api/models')await journal({event:'catalog-error',name:error.name,causeCode:error.cause?.code??null,frames:String(error.stack??'').split('\n').slice(1,5)});
     return send(res,400,{error:/^CHATGPT_CATALOG_(HTTP_\d{3}|SHAPE)$/.test(error.message)?error.message:'The operation did not complete. Check the connection, permissions and selected model.'});
   }
 });
@@ -168,7 +211,7 @@ await readFile(new URL('./web/index.html',import.meta.url));
 await appendFile(join(state,'server.jsonl'),JSON.stringify({pid:process.pid,port,started:new Date().toISOString()})+'\n');
 if(bootstrap)await (await import('node:fs/promises')).writeFile(join(state,'bootstrap-link.txt'),`http://127.0.0.1:${port}/#${bootstrap}`,{mode:0o600});
 console.log(`KotR seat workspace listening on 127.0.0.1:${port}.`);
-const timer=setInterval(()=>{if(Date.now()>=deadline)void close();else void tick()},1000);
+const timer=setInterval(()=>{expireSessions();if(Date.now()>=deadline)void close();else void tick()},1000);
 async function close(){
   if(closing)return;closing=true;clearInterval(timer);
   for(const s of sessions.values()){s.active=false;s.auth=''}

@@ -11,11 +11,16 @@ Method Receive(input As EnsLib.HL7.Message, Output reply As EnsLib.HL7.Message) 
     Set control=input.GetValueAt("MSH:10"),sender=input.GetValueAt("MSH:3")_"|"_input.GetValueAt("MSH:4")
     Try {
         Set kind=input.GetValueAt("MSH:9"),version=input.GetValueAt("MSH:12")
-        If ($Piece(kind,input.CS,1,2)'=("ORU"_input.CS_"R01"))!(version'="2.5")!(control="") {
+        // The admitted training fixture places PID second; schema-group paths vary across native importers.
+        Set patient=input.GetValueAt("2:3"),patientName=input.GetValueAt("2:5")
+        Set raw=input.OutputToString(,,.sc)
+        If $$$ISERR(sc) Throw ##class(%Exception.StatusException).CreateFromStatus(sc)
+        Set sep=$Extract(raw,4),cr=$Char(13),layout=($Length(raw,cr)=5)&&($Piece(raw,cr,5)="")
+        Set layout=layout&&($Piece($Piece(raw,cr,2),sep)="PID")&&($Piece($Piece(raw,cr,3),sep)="OBR")&&($Piece($Piece(raw,cr,4),sep)="OBX")
+        Set synthetic=(sender="KOTR_SYNTH|TEST")&&(input.GetValueAt("MSH:11")="T")&&($Extract(patient,1,15)="KOTR-SYNTHETIC-")&&(patientName=("SYNTHETIC"_input.CS_"KOTR"))
+        If ($Piece(kind,input.CS,1,2)'=("ORU"_input.CS_"R01"))!(version'="2.5")!(control="")!('layout)!('synthetic) {
             Set code="AR",state="PROFILE_REJECTED"
         } Else {
-            Set raw=input.OutputToString(,,.sc)
-            If $$$ISERR(sc) Throw ##class(%Exception.StatusException).CreateFromStatus(sc)
             Set reference=##class(%DynamicObject).%FromJSON(##class(KnAIghts.Health.Bridge).StoreHL7(raw)),digest=reference.sha256
             Do objects.%Push(reference)
             Lock +^KnAIghtsHealthMLLPKey(sender,control):1

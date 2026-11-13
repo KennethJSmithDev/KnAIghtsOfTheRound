@@ -43,6 +43,7 @@
     },
     {
       "id": "fhir-r4-r5",
+      "fhirVersions": ["4.0.1", "4.3.0", "5.0.0"],
       "stage": "LOCALLY_EXERCISED_R4",
       "operations": [
         "CapabilityStatement version check",
@@ -50,7 +51,7 @@
         "resource version/ETag retention and amendment observations"
       ],
       "limits": [
-        "R5 remains synthetic HTTP-fixture scope",
+        "R4B and R5 reader verification remains synthetic HTTP-fixture scope",
         "synthetic resources only",
         "no clinical or full profile-validation claim",
         "inspection performs GET only; fixture writes used a separate operator account"

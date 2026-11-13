@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {generateKeyPair,exportJWK,SignJWT,createLocalJWKSet} from 'jose';
 import {mkdir,mkdtemp,readFile} from 'node:fs/promises';
 import {join} from 'node:path';
+import {request} from 'node:http';
 import {Vault} from '../vault.mjs';
 import {verifyIdentity,ChatGPTAccount} from '../account.mjs';
 import {completedEvent} from '../provider.mjs';
@@ -38,6 +39,19 @@ test('identity-only sign-in does not enable plan use; pending login cancels with
  account.current={clientId:'fixture-client',subject:'fixture-subject',idToken:'synthetic-id-token',scopes:['openid'],expiresAt:Date.now()+3600000};
  assert.equal(account.status().connected,true);assert.equal(account.status().planEnabled,false);await assert.rejects(account.accessToken());
  const pending=account.login(()=>{});await new Promise(r=>setTimeout(r,30));const rejected=assert.rejects(pending);await account.close();await rejected;assert.equal(account.current.subject,'fixture-subject');
+});
+test('a malformed callback leaves the pending sign-in available',async()=>{
+ const dir=await mkdtemp(join(parent,'callback-')),account=new ChatGPTAccount(dir);await account.init();
+ let opened;
+ const ready=new Promise(resolve=>{opened=resolve});
+ const pending=account.login(url=>opened(new URL(url))),rejected=assert.rejects(pending);
+ try {
+  const authorization=await ready,callback=new URL(authorization.searchParams.get('redirect_uri'));
+  const ask=path=>new Promise((resolve,reject)=>{const req=request({host:'127.0.0.1',port:callback.port,path},res=>{res.resume();res.on('end',()=>resolve(res.statusCode))});req.on('error',reject);req.end()});
+  assert.equal(await ask('//['),400);
+  assert.equal(await ask('/auth/callback?state=wrong'),400);
+  assert.equal(account.pending,true);
+ } finally {await account.close();await rejected}
 });
 test('concurrent renewal rotates one protected record; disconnect retains registration without access',async()=>{
  const dir=await mkdtemp(join(parent,'renew-')),account=new ChatGPTAccount(dir);await account.init();

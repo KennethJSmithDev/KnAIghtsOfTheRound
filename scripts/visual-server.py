@@ -1,7 +1,7 @@
 """Loopback-only session broker. Holds a restricted IRIS credential, never Docker authority."""
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
-import json,os,secrets,time,urllib.request,urllib.error,base64,threading,datetime
+import json,os,secrets,time,urllib.request,urllib.error,base64,threading,datetime,tempfile,subprocess
 import argparse
 parser=argparse.ArgumentParser()
 parser.add_argument('--state',type=Path,required=True)
@@ -26,6 +26,19 @@ HEALTH_CONFIG=json.loads(HEALTH_PATH.read_text()) if HEALTH_PATH.exists() else N
 HEALTH_AUTH='Basic '+base64.b64encode((HEALTH_CONFIG['username']+':'+HEALTH_CONFIG['password']).encode()).decode() if HEALTH_CONFIG else None
 HEALTH_TOKEN=(ROOT/'private/health-access.txt').read_text().strip() if HEALTH_CONFIG else None
 HEALTH_COOKIE=secrets.token_urlsafe(32) if HEALTH_CONFIG else None
+def write_readiness(value):
+    with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',dir=ROOT/'private',prefix='viewer-ready-',delete=False) as target:
+        path=Path(target.name)
+        try:
+            if os.name=='nt':
+                flags=subprocess.CREATE_NO_WINDOW
+                user=subprocess.check_output(['whoami'],text=True,creationflags=flags).strip()
+                subprocess.run(['icacls',str(path),'/inheritance:r','/grant:r',user+':F','SYSTEM:F'],check=True,capture_output=True,creationflags=flags)
+            target.write(json.dumps(value))
+        except BaseException:
+            target.close();path.unlink();raise
+    try:os.replace(path,ROOT/'ready.json')
+    finally:path.unlink(missing_ok=True)
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self,*a,**k):super().__init__(*a,directory=str(DIST),**k)
     def log_message(self,*a):pass
@@ -139,6 +152,6 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception:self.answer(502,{'error':'SERVICE_UNAVAILABLE','state':'UNKNOWN'})
 with ThreadingHTTPServer(('127.0.0.1',0),Handler) as server:
     server.timeout=.5
-    (ROOT/'ready.json').write_text(json.dumps({'pid':os.getpid(),'port':server.server_port,'token':TOKEN}))
+    write_readiness({'pid':os.getpid(),'port':server.server_port,'token':TOKEN})
     while time.time()<DEADLINE and not (ROOT/'STOP_BROKER').exists():server.handle_request()
     (ROOT/'broker-closure.json').write_text(json.dumps({'stopped':True,'submittedRequestIds':sorted(REQUESTS)}))

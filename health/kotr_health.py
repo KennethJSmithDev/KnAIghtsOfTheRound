@@ -8,11 +8,14 @@ import base64
 import datetime as dt
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
 import tempfile
+import threading
 import time
+import socket
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -26,6 +29,25 @@ KINDS = {"dicom-file", "dicomweb-metadata", "dicomweb-instance", "orthanc-instan
 class SourceError(Exception):
     def __init__(self, code):
         self.code = code
+
+def distinct_members(pairs):
+    value = dict(pairs)
+    if len(value) != len(pairs):
+        raise ValueError("duplicate JSON members")
+    return value
+
+def finite_number(text):
+    value = float(text)
+    if not math.isfinite(value):
+        raise ValueError("non-finite JSON number")
+    return value
+
+def invalid_constant(_):
+    raise ValueError("non-JSON number")
+
+def parse_json(raw):
+    return json.loads(raw, object_pairs_hook=distinct_members,
+                      parse_constant=invalid_constant, parse_float=finite_number)
 
 def valid_uid(value):
     return isinstance(value, str) and len(value) <= 64 and UID.fullmatch(value)
@@ -52,6 +74,8 @@ class Archive:
                 if time.monotonic() > deadline:
                     raise SourceError("SOURCE_READ_TIMEOUT")
                 chunk = stream.read(min(65536, limit + 1 - count))
+                if time.monotonic() > deadline:
+                    raise SourceError("SOURCE_READ_TIMEOUT")
                 if not chunk:
                     break
                 count += len(chunk)
@@ -82,7 +106,7 @@ class Archive:
         if reference["bytes"] > MAX_JSON:
             raise SourceError("SOURCE_TOO_LARGE")
         try:
-            return json.loads(self.path(reference).read_bytes())
+            return parse_json(self.path(reference).read_bytes())
         except (ValueError, UnicodeError):
             raise SourceError("INVALID_JSON") from None
 
@@ -90,13 +114,57 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         return None
 
+class ReceiveDeadline:
+    def __init__(self):
+        self.expired = threading.Event()
+        self.timer = None
+
+    def start(self, connection):
+        def interrupt():
+            self.expired.set()
+            try:
+                connection.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+        self.timer = threading.Timer(15, interrupt)
+        self.timer.daemon = True
+        self.timer.start()
+
+    def close(self):
+        if self.timer is not None:
+            self.timer.cancel()
+            self.timer.join()
+
+class DeadlineHandler:
+    def __init__(self, deadline):
+        self.deadline = deadline
+        super().__init__()
+
+    def do_open(self, connection_class, request, **kwargs):
+        def connect(*args, **options):
+            connection = connection_class(*args, **options)
+            getresponse = connection.getresponse
+            def response():
+                # Arm before header parsing; the same socket budget covers the body and chunk framing.
+                self.deadline.start(connection.sock)
+                return getresponse()
+            connection.getresponse = response
+            return connection
+        return super().do_open(connect, request, **kwargs)
+
+class DeadlineHTTPHandler(DeadlineHandler, urllib.request.HTTPHandler):
+    pass
+
+class DeadlineHTTPSHandler(DeadlineHandler, urllib.request.HTTPSHandler):
+    pass
+
 class Inspector:
     def __init__(self, profiles, archive):
         self.archive = Archive(archive)
         path = Path(profiles)
         if path.stat().st_size > 65536:
             raise SourceError("PROFILE_TOO_LARGE")
-        self.profiles = json.loads(path.read_bytes())
+        self.profiles = parse_json(path.read_bytes())
         if not isinstance(self.profiles, dict) or self.profiles.get("version") != 1 or not isinstance(self.profiles.get("sources"), dict):
             raise SourceError("UNSUPPORTED_PROFILE")
 
@@ -123,22 +191,29 @@ class Inspector:
                 headers["Authorization"] = "Basic " + base64.b64encode(secret.encode("ascii")).decode("ascii")
             else:
                 raise SourceError("INVALID_AUTH_PROFILE")
-        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+        budget = ReceiveDeadline()
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect(),
+                                            DeadlineHTTPHandler(budget), DeadlineHTTPSHandler(budget))
         try:
-            with opener.open(urllib.request.Request(base.rstrip("/") + suffix, headers=headers), timeout=8) as response:
-                media = response.headers.get_content_type()
-                if response.status == 204:
-                    raise SourceError("NO_MATCHES")
-                if response.status != 200:
-                    raise SourceError("UNEXPECTED_HTTP_STATUS")
-                if media != accepted.split(";", 1)[0]:
-                    raise SourceError("UNEXPECTED_MEDIA_TYPE")
-                if response.headers.get("Content-Encoding", "identity") != "identity":
-                    raise SourceError("UNEXPECTED_CONTENT_ENCODING")
-                reference = self.archive.capture(response, limit, media)
-                reference["contentType"] = response.headers.get("Content-Type", "")[:1024]
-                reference["etag"] = response.headers.get("ETag", "")[:256]
-                return reference
+            try:
+                with opener.open(urllib.request.Request(base.rstrip("/") + suffix, headers=headers), timeout=8) as response:
+                    media = response.headers.get_content_type()
+                    if response.status == 204:
+                        raise SourceError("NO_MATCHES")
+                    if response.status != 200:
+                        raise SourceError("UNEXPECTED_HTTP_STATUS")
+                    if media != accepted.split(";", 1)[0]:
+                        raise SourceError("UNEXPECTED_MEDIA_TYPE")
+                    if response.headers.get("Content-Encoding", "identity") != "identity":
+                        raise SourceError("UNEXPECTED_CONTENT_ENCODING")
+                    reference = self.archive.capture(response, limit, media)
+                    reference["contentType"] = response.headers.get("Content-Type", "")[:1024]
+                    reference["etag"] = response.headers.get("ETag", "")[:256]
+                    return reference
+            finally:
+                budget.close()
+                if budget.expired.is_set():
+                    raise SourceError("SOURCE_READ_TIMEOUT")
         except urllib.error.HTTPError as error:
             raise SourceError({401: "SOURCE_UNAUTHORIZED", 403: "SOURCE_FORBIDDEN", 404: "SOURCE_NOT_FOUND"}.get(error.code, "SOURCE_HTTP_ERROR")) from None
         except (urllib.error.URLError, TimeoutError, OSError):
@@ -247,7 +322,7 @@ class Inspector:
                     result["projection"] = {**identities, "orthancInstanceId": oid}
             elif kind == "fhir-resource":
                 version = source.get("fhirVersion")
-                if version not in ("4.0.1", "5.0.0"):
+                if version not in ("4.0.1", "4.3.0", "5.0.0"):
                     raise SourceError("FHIR_VERSION_NOT_ADMITTED")
                 reference = self.get(source, "/metadata", "application/fhir+json")
                 objects.append(reference)
@@ -262,8 +337,15 @@ class Inspector:
                 value = self.archive.json(reference)
                 if not isinstance(value, dict) or value.get("resourceType") != resource_type or value.get("id") != resource_id:
                     raise SourceError("SOURCE_IDENTITY_MISMATCH")
+                meta = value.get("meta", {})
+                if not isinstance(meta, dict):
+                    raise SourceError("INVALID_FHIR_PROJECTION")
+                version_id, source_status = meta.get("versionId"), value.get("status")
+                if (version_id is not None and (not isinstance(version_id, str) or not FHIR_ID.fullmatch(version_id))
+                        or source_status is not None and (not isinstance(source_status, str) or len(source_status) > 64)):
+                    raise SourceError("INVALID_FHIR_PROJECTION")
                 projection = {"fhirVersion": version, "resourceType": resource_type, "resourceId": resource_id,
-                              "versionId": value.get("meta", {}).get("versionId"), "sourceStatus": value.get("status")}
+                              "versionId": version_id, "sourceStatus": source_status}
                 if resource_type == "ImagingStudy":
                     ids = [i.get("value", "") for i in value.get("identifier", []) if i.get("system") == "urn:dicom:uid"]
                     if len(ids) != 1 or not ids[0].startswith("urn:oid:"):
@@ -295,7 +377,7 @@ def catalog(profiles):
     path = Path(profiles)
     if path.stat().st_size > 65536:
         raise SourceError("PROFILE_TOO_LARGE")
-    value = json.loads(path.read_bytes())
+    value = parse_json(path.read_bytes())
     if value.get("version") != 1 or not isinstance(value.get("sources"), dict) or len(value["sources"]) > 256:
         raise SourceError("UNSUPPORTED_PROFILE")
     # Discovery exposes identity and scope, never endpoint, file or credential configuration.

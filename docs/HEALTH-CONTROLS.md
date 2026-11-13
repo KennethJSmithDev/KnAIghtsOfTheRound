@@ -9,7 +9,8 @@ match patients, make diagnoses, complete Workflow review or execute tasks.
 
 | Capability | Locally exercised scope | Remaining boundary |
 | --- | --- | --- |
-| IRIS FHIR R4 repository | Authenticated reads of ImagingStudy, DiagnosticReport, Observation, DocumentReference, ServiceRequest and Provenance; source version and ETag; denied read/write and missing-resource cases. | A synthetic Patient was seeded as fixture preparation. No clinical, broad profile-validation, R5 repository, SMART/OAuth or write-capable agent claim. |
+| IRIS FHIR R4 repository | Authenticated reads of ImagingStudy, DiagnosticReport, Observation, DocumentReference, ServiceRequest and Provenance; source version and ETag; denied read/write and missing-resource cases. | A synthetic Patient was seeded as fixture preparation. KotR's reader performs GET requests only. |
+| FHIR R4B/R5 client | Native KotR health production and authenticated vendor stdio MCP read six synthetic resource types per version through a local Basic-authentication gateway to pinned Candle. Independent IRIS receipt/archive readback, retained-state/retry and refusal checks passed. | This qualifies the client/MCP path. Fresh IRIS-hosted R4B/R5 repository reads remain unverified. |
 | DICOM DIMSE | Native IRIS C-ECHO receiver, configured calling/called AETs and Verification presentation context; unconfigured AETs and storage context refused. | C-FIND, C-GET, C-MOVE and C-STORE are not implemented by this profile. AETs are not clinical authentication. |
 | HL7 MLLP | Native IRIS framing, ASCII 2.5 ORU_R01, fragmented input, application ACK correlation and retransmission handling. | No broad message-profile, multi-sender, crash/load or clinical qualification. |
 | Health MCP | Actual vendor stdio discovery and invocation of three health tools, retained-state reads, retry identity and denied-source checks. | Existing case-review MCP endpoints and their permissions remain separate. No provider inference is needed to inspect sources. |
@@ -18,8 +19,13 @@ match patients, make diagnoses, complete Workflow review or execute tasks.
 FHIR inspection performs GET requests only. The operator used a separate writer
 account to seed and amend synthetic resources in the qualification fixture.
 An amendment produced a new source version and archive hash while the earlier
-observation remained readable. R5 still has its earlier synthetic HTTP-fixture
-scope; it is not promoted to native-repository qualification.
+observation remained readable. The viewer, Book of Receipts and dashboard also
+rendered the reader’s R4, R4B and R5 receipts through a synthetic API fixture.
+The MCP tools use the same IRIS receipt. Separate native R4B/R5 MCP checks passed
+against Candle through the authenticated gateway. The installed 59-class archive
+also passed synthetic FHIR reads for all three versions and restricted health-MCP
+checks. These source inspections do not establish a combined native inference,
+Seats and Workflow execution.
 
 The DIMSE observation refers to completed native command headers and bodies. It
 does not invent a second DICOM event ledger or imply a study/image was retrieved.
@@ -97,7 +103,10 @@ still uses a named environment credential reference. A native R4 example is:
 
 Run only inside the approved isolated HTTP fixture, or configure HTTPS with
 normal certificate validation. The authenticated FHIR source user and the health
-control caller have different roles.
+control caller have different roles. For an owned R4B or R5 endpoint, set its
+base URL and exact `fhirVersion` (`4.3.0` or `5.0.0`). Both versions passed
+the reader's authenticated synthetic HTTP checks. The installer example above
+and the native viewer captures cover R4.
 
 ## Optional listeners
 

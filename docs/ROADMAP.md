@@ -16,7 +16,7 @@ articles and authentic demonstrations.
 | Round Table, dashboard and Book | Shared case state, original procedural knights and a lightweight view; recorded replay and static simulation are disclosed separately. | Scoped browser checks; physical-phone thermal/battery behavior remains deferred. |
 | Workflow, custom adapter, Java PEX and vector context | Mismatch worklist, six hand-defined advisory features, checked PEX context, authorized review and persisted notice shown in the Book. | Local connected native/browser flow; review stays separate from synthetic task approval and execution. |
 | Provider/account/seat options | Supported client sign-in options, direct local ChatGPT account/model selection, per-seat permissions and scheduling. | One real ChatGPT registration and two real direct reviews; other real accounts, remote expiry/revocation, hosted tenancy and broad concurrency remain unqualified. |
-| Health-source interoperability | Synthetic DICOM/DICOMweb/Orthanc reads, authenticated native R4 resource reads, C-ECHO Verification, MLLP/ACK/replay and separate viewer/MCP controls. | Protocol-specific local fixtures; no clinical use, patient matching, DIMSE query/retrieve/storage or R5 repository claim. |
+| Health-source interoperability | Synthetic DICOM/DICOMweb/Orthanc reads, authenticated native R4 resource reads, C-ECHO Verification, MLLP/ACK/replay and separate viewer/MCP controls. | Native KotR/MCP checks read R4B/R5 synthetic resources through an authenticated local gateway to Candle. IRIS-hosted repository qualification covers R4; fresh IRIS-hosted R4B/R5 reads remain unverified. DIMSE evidence covers Verification. |
 
 Use [the judge walkthrough](JUDGE-WALKTHROUGH.md) for the core contest execution,
 [connected review setup](CONTEXT-LIVE.md), [health controls](HEALTH-CONTROLS.md)
@@ -28,8 +28,12 @@ source file is not proof of a complete install or combined deployment.
 - Public IPM 0.1.0 passed registry installation and lifecycle checks for its
   twelve-class synthetic core on Build 154 with IPM 0.10.9. See the
   [qualification summary](INTEROPERABILITY.md#qualification-evidence).
-- The complete 58-class integrated IPM package remains unbuilt and unqualified.
-  Its distribution and lifecycle qualification are deferred during the freeze.
+- The opt-in 59-class integrated IPM archive passed local Build 154 installation,
+  synthetic runtime and restart/uninstall/reinstall checks. It requires a dedicated
+  empty namespace, separately supplied runtime inputs, explicit setup and production
+  start. Its local version remains `0.1.0-local.1`; public registry delivery and a
+  one-command graphical installer remain separate work.
+- The `0.2.0` source update preserves the public twelve-class IPM `0.1.0` contract.
 - Follow the documented setup from a declared fresh environment using the exact
   source and vendor prerequisites a reviewer can obtain. Preserve meaningful
   success, refusal, recovery and authority checks.
@@ -42,9 +46,9 @@ source file is not proof of a complete install or combined deployment.
 
 This work is deferred during the freeze. Possible DIMSE additions include native
 C-FIND and separately negotiated retrieval and storage. Other directions include
-broader HL7 ADT, ORM/OMI, amendment and MDM semantics and independently qualified
-R5 and SMART/OAuth repository profiles. Preserve each source's identifiers, versions,
-transport outcome and original evidence. Patient/image/report relationships need
+broader HL7 ADT, ORM/OMI, amendment and MDM semantics, fresh IRIS-hosted
+R4B and R5 repository checks, and SMART/OAuth profiles. Preserve each source's
+identifiers, versions, transport outcome and original evidence. Patient/image/report relationships need
 explicit source evidence rather than text similarity.
 
 Further directions include DICOM SR/SEG source references, CDA/C-CDA, IHE document

@@ -24,22 +24,38 @@ to the disclosed synthetic cases; the default core package does not install them
 | DICOM Part 10 file | Read identity metadata with pinned pydicom; retain original bytes. | One synthetic CT; no pixel decoding. |
 | DICOMweb | QIDO-RS study lookup; WADO-RS instance metadata and single-instance multipart retrieval. | Actual isolated Orthanc server and one synthetic CT. |
 | Orthanc REST | Follow instance → series → study using Orthanc IDs; retrieve the instance file. | Actual isolated server, with DICOM identities checked independently. |
-| FHIR R4 / R5 | Check CapabilityStatement version, read admitted resources, preserve resource version and source status. | Actual authenticated IRIS R4 repository for six admitted resource types; R5 remains a synthetic HTTP fixture. No full-profile validation claim. |
+| FHIR R4, R4B and R5 | Check CapabilityStatement version, read admitted resources, preserve resource version and source status. | Authenticated IRIS-hosted R4 reads; native KotR/MCP R4B/R5 reads of six synthetic types per version through a local authenticated gateway to Candle; separate synthetic HTTP contract tests for all three versions. |
 | HL7v2 | Retain original ER7, parse with `EnsLib.HL7.Message`, project MSH identity. | ASCII 2.5 ORU_R01, including a nondefault component separator. The separate MLLP profile qualifies framing, application ACK and retransmission behavior. |
 | DICOM DIMSE | Optional native IRIS Verification receiver with explicit AET/presentation-context configuration. | C-ECHO only; no C-FIND, retrieval or image storage. |
 
-The FHIR reader preserves the complete original resource. Its implementation
-also admits configured Observation, DocumentReference, ServiceRequest and
-Provenance reads at the identity-envelope level. These six admitted types have
-each passed a local synthetic R4 repository inspection through the production.
+Set `fhirVersion` to `4.0.1`, `4.3.0` or `5.0.0`. The reader requires an
+exact version match from `GET /metadata` before requesting the resource.
+It preserves the original bytes and checks the identity of the configured
+ImagingStudy, DiagnosticReport, Observation, DocumentReference, ServiceRequest
+or Provenance. All six passed inspection through the native R4 production.
+All six types per version also passed separate native KotR/MCP R4B/R5 checks
+against a pinned local Candle repository through a Basic-authentication gateway.
+Independent native readback verified the IRIS receipts and archived bytes.
+Retained-state reads and identical retries made no new source requests. Fresh
+IRIS-hosted R4B/R5 repository reads remain unverified. The viewer and MCP use the
+source version carried in the IRIS receipt.
+
+The declared read contract passed 13 checks per version. Selected offline HL7
+base-profile checks covered 24 positive resource/metadata/draft inputs with no
+errors or fatal issues and six rejected negative controls; warnings remained and
+live terminology was disabled. Candle's R5 CapabilityStatement failed validation
+because it advertised abstract resource types. The passing R5 metadata check
+used retained, hash-matched IRIS metadata instead. These results do not establish
+runtime profile validation, full terminology or implementation-guide conformance,
+FHIR search/history, writes or SMART authorization.
 
 ## Ownership and source identity
 
 - DICOM Study/Series/SOP Instance UIDs remain distinct. Orthanc's internal IDs
   are navigation keys, not DICOM UIDs.
 - A FHIR resource's type, logical ID, `meta.versionId`, HTTP ETag and DICOM UID
-  are different identities. R4 and R5 resources are retained at their declared
-  version; this module does not transform between versions.
+  are different identities. Each resource is retained at its declared version. The
+  reader preserves that version in the receipt.
 - HL7 message control ID identifies the source message. An accession, patient
   identifier or text mention is not treated as a DICOM Study UID. This module
   performs no patient matching or report-to-image/finding inference.
@@ -147,6 +163,7 @@ spatial similarity. No universal healthcare interoperability is claimed.
 
 Primary references: [DICOMweb services](https://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_10.html),
 [FHIR R4 ImagingStudy](https://hl7.org/fhir/R4/imagingstudy.html),
+[FHIR R4B ImagingStudy](https://hl7.org/fhir/R4B/imagingstudy.html),
 [FHIR R5 ImagingStudy](https://hl7.org/fhir/R5/imagingstudy.html),
 [Orthanc REST](https://orthanc.uclouvain.be/book/users/rest.html),
 [IRIS native HL7 message class](https://docs.intersystems.com/healthconnectlatest/csp/documatic/%25CSP.Documatic.cls?CLASSNAME=EnsLib.HL7.Message&LIBRARY=ENSLIB),

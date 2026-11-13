@@ -87,7 +87,11 @@ export class ChatGPTAccount {
         const timer=setTimeout(()=>reject(new Error('Sign-in timed out.')),180000);timer.unref();
         this.cancelPending=()=>{clearTimeout(timer);reject(new Error('Sign-in cancelled.'))};
         server.on('request',(req,res)=>{
-          const u=new URL(req.url,'http://127.0.0.1');
+          let u;
+          try {
+            if(!req.url?.startsWith('/')||req.url.startsWith('//'))throw new Error('Invalid callback target.');
+            u=new URL(req.url,'http://127.0.0.1');
+          } catch {res.writeHead(400).end('Invalid callback target.');return}
           if(req.method!=='GET'||u.pathname!=='/auth/callback'){res.writeHead(404).end();return}
           if(u.searchParams.get('state')!==state){res.writeHead(400).end('Invalid sign-in response.');return}
           clearTimeout(timer);res.writeHead(200,{'Content-Type':'text/plain','Cache-Control':'no-store','Referrer-Policy':'no-referrer'}).end('You may close this tab and return to KnAIghts of the Round.');

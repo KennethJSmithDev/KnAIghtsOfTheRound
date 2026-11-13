@@ -44,8 +44,9 @@ Built for the **InterSystems AI Agents in Interoperability Workflows contest**, 
 - Auditable dispositions that can be checked against message records.
 - An authenticated Codex MCP seat and a native AI Hub agent route.
 - ChatGPT/Codex sign-in through the local Codex client, with optional [provider and MCP seat profiles](docs/PROVIDER-SEATS.md) for additional clients and read-only audit/context tools.
-- An opt-in [health-source inspection production](docs/HEALTH-SOURCES.md) for synthetic DICOM, DICOMweb, Orthanc, FHIR and HL7v2 evidence, with per-protocol qualification limits.
-- Optional [health-source controls](docs/HEALTH-CONTROLS.md) connect the viewer and a separate MCP endpoint to authenticated R4 repository reads, native DICOM C-ECHO observations and HL7 MLLP/ACK receipts. These are locally qualified synthetic profiles; DIMSE query/retrieve and image storage remain planned.
+- An opt-in [health-source inspection production](docs/HEALTH-SOURCES.md) for synthetic DICOM, DICOMweb, Orthanc, FHIR R4/R4B/R5 and HL7v2 evidence, with per-protocol qualification limits.
+- Optional [health-source controls](docs/HEALTH-CONTROLS.md) connect the viewer and a separate MCP endpoint to synthetic FHIR source observations, native DICOM C-ECHO and HL7 MLLP/ACK receipts. IRIS-hosted FHIR repository qualification covers R4. Separate native KotR/MCP checks read R4B and R5 synthetic resources through an authenticated local gateway to Candle; IRIS-hosted R4B/R5 repository reads remain unverified.
+- An offline [FHIR OpenAPI exporter](docs/FHIR-OPENAPI.md) for selected R4, R4B and R5 read routes, with bundled synthetic examples.
 - Operator-approved synthetic task updates with evidence revisions and duplicate-request checks.
 - An optional local Workflow worklist and custom notice adapter for synthetic mismatch review.
 - An optional Java PEX and IRIS Vector Search profile that supplies advisory related-case context to that worklist, with a separately authenticated [local live-viewer connection](docs/CONTEXT-LIVE.md).
@@ -61,7 +62,9 @@ Both demonstration cases use the same `KnAIghtsEntry → AssessEvidence` product
 
 Explore the implementation: [production](src/KnAIghts/Review/Production.cls), [review and validation](src/KnAIghts/Review/Operation.cls), [authorized evidence tool](src/KnAIghts/Review/Tools.cls), and [operator task](src/KnAIghts/Review/SyntheticTask.cls).
 
-Clients can build on this shared review boundary. DICOM3D is the first planned domain adapter. The repository includes the optional dashboard and Round Table. The public IPM package supplies the twelve-class core. Workflow, PEX, and vector profiles have separate local setup, and the complete 58-class integrated distribution remains unbuilt and unqualified. See [local graphical setup](docs/VISUAL_LOCAL.md) and the [local PEX and vector profile](docs/PEX-VECTOR.md).
+Clients can build on this shared review boundary. DICOM3D is the first planned domain adapter. The repository includes the optional dashboard and Round Table. The public IPM package supplies the twelve-class core. Workflow, PEX, and vector profiles have separate local setup. The opt-in 59-class integrated IPM profile has local synthetic installation and lifecycle qualification and requires explicit runtime provisioning. See [local graphical setup](docs/VISUAL_LOCAL.md) and the [local PEX and vector profile](docs/PEX-VECTOR.md).
+
+This source update is version `0.2.0`. The public IPM core remains `0.1.0`; the separately qualified local integrated profile remains `0.1.0-local.1`. Optional graphical clients and providers require their documented setup.
 
 ## Getting started
 
@@ -128,7 +131,7 @@ The synthetic task API has passed sequential state, permission, evidence-change,
 
 ## Technology implementation map
 
-The public IPM 0.1.0 package is the qualified twelve-class core. This repository also includes expanded optional implementations with separately accepted local Build 154 evidence. A complete 58-class integrated IPM distribution is **unfinished and not built**; use the profile-specific source setup below. Raw qualification logs and credentials remain private.
+The public IPM 0.1.0 package is the qualified twelve-class core. This repository also includes expanded optional implementations with separately accepted local Build 154 evidence. The opt-in 59-class integrated IPM profile has local Build 154 installation and lifecycle qualification. Its runtime dependencies and selected production require explicit setup and start; use the profile-specific source instructions below. Raw qualification logs and credentials remain private.
 
 | Technology | Implementation | Reproduce and inspect the recorded scope |
 | --- | --- | --- |
@@ -141,6 +144,17 @@ The public IPM 0.1.0 package is the qualified twelve-class core. This repository
 | IRIS Vector Search | [Native query](src/KnAIghts/Context/Vector.cls) and [SQL/HNSW schema](sql/context-index-v1.sql) | [Setup and query-plan scope](docs/PEX-VECTOR.md). Six hand-defined features; no learned-embedding or performance claim. |
 
 These links expose implementations and reproduction instructions, not organizer acceptance of contest bonuses. Optional profile qualification does not establish a fresh integrated-package installation.
+
+## Community Ideas
+
+KotR includes scoped work related to these InterSystems Community Ideas:
+
+- [DPI-I-804 — Generate OpenAPI from a FHIR Capability Statement](https://ideas.intersystems.com/ideas/DPI-I-804): the original [FHIR OpenAPI exporter](docs/FHIR-OPENAPI.md) describes selected R4, R4B and R5 current-resource reads.
+- [DPI-I-389 — Expose production message classes](https://ideas.intersystems.com/ideas/DPI-I-389) and [DPI-I-390 — Suggest transformation message types](https://ideas.intersystems.com/ideas/DPI-I-390): the [source inventory and route hints](docs/PRODUCTION-MESSAGES.md) identify declared message types; they do not change the native transformation editor.
+- [DP-I-147 — Editable HL7 Editor in the Message Viewer](https://ideas.intersystems.com/ideas/DP-I-147) and [DPI-I-973 — Message metadata](https://ideas.intersystems.com/ideas/DPI-I-973): the [synthetic HL7 sandbox](docs/HL7-SANDBOX.md) previews a limited edit and links verified transport receipts. It does not edit the Management Portal Message Viewer.
+- [DPI-I-439 — AI-powered test automation](https://ideas.intersystems.com/ideas/DPI-I-439): the [synthetic assertion checker](docs/SYNTHETIC-TEST-DESIGN.md) compares reviewed plans with retained audit exports.
+
+These links describe scoped implementations; contest bonus eligibility and organizer acceptance are separate.
 
 ## Roadmap
 
