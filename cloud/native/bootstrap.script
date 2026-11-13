@@ -27,7 +27,8 @@ If $SYSTEM.Status.IsError(sc) { Kill p Set p("NameSpace")="USER",p("DispatchClas
 Kill p
 Set $Namespace="USER"
 Set rows=##class(%SQL.Statement).%ExecDirect(,"GRANT SELECT ON Ens.MessageHeader TO KnAIghtsCloudMessage")
-If rows.%SQLCODE'=0 { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL message read grant",! Halt }
+; GRANT returns 0 when applied and 100 when the privilege is already held.
+If (rows.%SQLCODE'=0)&&(rows.%SQLCODE'=100) { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL message read grant SQLCODE=",rows.%SQLCODE,! Halt }
 Write !,"KOTR_CLOUD_STAGE:SECURITY_OK",!
 Write !,"KOTR_CLOUD_STAGE:PRODUCTION",!
 Set sc=##class(KnAIghts.Review.App).Start()
