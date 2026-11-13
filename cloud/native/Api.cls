@@ -36,6 +36,10 @@ ClassMethod Health() As %Status
     Set result={"status":"OK","production":"KnAIghts.Review.Production"}
     Do result.%Set("mode",mode)
     Do result.%Set("running",runtime.%Get("running"),"boolean")
+    Do result.%Set("agent",##class(KnAIghts.CloudDemo.State).Profile())
+    Do result.%Set("allowance",##class(KnAIghts.CloudDemo.State).Allowance())
+    Do result.%Set("byokEnabled",##class(KnAIghts.CloudDemo.State).ByokEnabled(),"boolean")
+    Do result.%Set("newReviewsBlocked",##class(KnAIghts.CloudDemo.State).NewReviewsBlocked(),"boolean")
     If ('runtime.%Get("running")) || ('runtime.%Get("liveEnabled")) || (mode="") Do result.%Set("status","PRODUCTION_UNAVAILABLE")
     Quit ..Answer(result)
 }
@@ -57,11 +61,12 @@ ClassMethod Review() As %Status
         Set body=%request.Content.Read(1025)
         Set valid=($Length(body)<1025) && %request.Content.AtEnd
         Set input=##class(%DynamicObject).%FromJSON(body)
-        Set valid=valid && (input.%Size()=2) && (input.%GetTypeOf("caseId")="string") && (input.%GetTypeOf("requestId")="string")
+        Set valid=valid && (input.%GetTypeOf("caseId")="string") && (input.%GetTypeOf("requestId")="string")
+        Set valid=valid && ((input.%Size()=2) || ((input.%Size()=3) && (input.%GetTypeOf("leaseId")="string")))
     } Catch exception {
         Set valid=0
     }
     If 'valid Quit ..Answer({"status":"INVALID_REQUEST"})
-    Quit ..Answer(##class(KnAIghts.CloudDemo.State).Run(input.%Get("caseId"),input.%Get("requestId")))
+    Quit ..Answer(##class(KnAIghts.CloudDemo.State).Run(input.%Get("caseId"),input.%Get("requestId"),input.%Get("leaseId")))
 }
 }

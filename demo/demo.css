@@ -11,3 +11,29 @@
 @media(max-width:370px){.brand strong small{display:none}.simulation-badge{max-width:7.5rem;white-space:normal}.workspace-heading{display:block}.view-switch{margin-top:.7rem;width:max-content}.scene-foot span:last-child{font-size:.48rem}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 .chamber-card:not([data-projection="verified"]) .selection-marker{display:none}
+
+/* Native demo header status; shared simulation styles remain unchanged. */
+
+    .native-topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+    .native-topbar .native-overview{grid-column:1/-1;min-width:0;border-top:1px solid var(--line);padding-top:.8rem}
+    .native-topbar .native-facts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);gap:.7rem;margin:0}
+    .native-topbar .native-facts>div{min-width:0;padding:.65rem .75rem;border:1px solid var(--line);border-radius:6px;background:#211e1b}
+    .native-topbar .native-facts dt{margin-bottom:.3rem;color:var(--gold);font-size:.63rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .native-topbar .native-facts dd{margin:0;color:#f0e5d4;font-size:.82rem;font-weight:650;line-height:1.4;overflow-wrap:anywhere}
+    .native-topbar .native-facts small{display:block;margin-top:.25rem;color:#bbad99;font-size:.7rem;font-weight:400;line-height:1.45;overflow-wrap:anywhere}
+    .native-topbar .native-access{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-top:.6rem;color:#bbad99;font-size:.7rem;line-height:1.45}
+    .native-topbar .native-access p{margin:0;min-width:0;overflow-wrap:anywhere}.native-topbar .native-access strong{color:var(--teal)}
+    .native-topbar .native-refresh{flex:none;min-height:44px;padding:.5rem .7rem;border:1px solid #796144;border-radius:6px;background:#2e241c;color:#ead5b3;font-size:.72rem}
+    .native-topbar .native-refresh:disabled{cursor:wait;opacity:.7}.native-topbar .native-health-note{margin:.25rem 0 0;color:#bbad99;font-size:.68rem;line-height:1.4}
+    .native-topbar .simulation-badge[data-state=unknown]{color:#bbad99}.native-topbar .simulation-badge[data-state=unknown]>span{background:#a99d8e}
+    @media(max-width:660px){.native-topbar{gap:.65rem}.native-topbar .native-facts{grid-template-columns:minmax(0,1fr);gap:.4rem}.native-topbar .native-facts>div{padding:.5rem .65rem}.native-topbar .native-facts dt{margin-bottom:.2rem}.native-topbar .native-access{align-items:flex-start;gap:.5rem}.native-topbar .native-refresh{max-width:6.7rem;white-space:normal}}
+    .native-topbar #native-badge-text{display:inline;width:auto;height:auto;background:none;border-radius:0}
+
+/* Optional temporary-key controls; profile and receipt ownership stay separate. */
+.review-profile-picker,.live-review-settings{min-width:0;margin:1rem 0;padding:.7rem;border:1px solid #796144;border-radius:6px;color:#ded0bc;font-size:.75rem;line-height:1.5}
+.review-profile-picker legend,.live-review-settings legend{padding:0 .3rem;color:var(--gold);font-weight:700}.review-profile-picker>label{display:flex;align-items:flex-start;gap:.45rem;min-height:44px;padding:.5rem 0}.review-profile-picker input{flex:none;margin:.2rem 0 0}
+.live-review-settings>p{margin:.25rem 0 .7rem}.live-review-settings>label:not(.live-consent){display:block;margin-bottom:.35rem;font-weight:700}.live-review-settings input[type=password]{width:100%;min-width:0;min-height:44px;padding:.6rem;border:1px solid #8e7759;border-radius:5px;background:#161b1b;color:#f0e5d4;font:inherit}.live-review-settings input[type=password]:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.live-review-settings .live-consent{display:flex;align-items:flex-start;gap:.5rem;padding:.35rem 0;overflow-wrap:anywhere}.live-consent input{flex:none;margin:.25rem 0 0}.live-review-settings:disabled{opacity:.75}
+
+#run-review:disabled{background:#514335;border-color:#796144;color:#c5b6a1;cursor:not-allowed}
+@media(min-width:661px){.workspace-grid:has(.live-review-settings:not([hidden])) .chamber-card{align-self:start}.workspace-grid:has(.live-review-settings:not([hidden])) .scene-wrap{height:clamp(360px,42vw,520px);flex:none}}

@@ -11,12 +11,21 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar">
+    <header class="topbar native-topbar">
       <a class="brand" href="./" aria-label="KnAIghts of The Round, start over">
         <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 35 9v12c0 9-6 14-15 17C11 35 5 30 5 21V9Z"/><path d="M20 8v21M11 16h18M14 25l6 6 6-6"/></svg>
         <span><strong>KnAIghts <small>of The Round</small></strong><span>THE COUNCIL CHAMBER</span></span>
       </a>
-      <div class="topbar-right"><span class="simulation-badge"><span aria-hidden="true"></span> LIVE IRIS</span><button class="info-button" type="button" id="about-open" aria-label="About this native demo">i</button></div>
+      <div class="topbar-right"><span class="simulation-badge" id="native-badge" data-state="unknown"><span aria-hidden="true"></span><span id="native-badge-text">CHECKING IRIS</span></span><button class="info-button" type="button" id="about-open" aria-label="About this native demo">i</button></div>
+      <section class="native-overview" id="native-overview" aria-label="Native demo status" aria-busy="true">
+        <dl class="native-facts">
+          <div><dt>IRIS production</dt><dd><span id="native-readiness">Checking readiness…</span><small id="native-production">Production status unavailable</small></dd></div>
+          <div><dt>Agent profile</dt><dd><span id="native-profile">Profile unavailable</span><small id="native-mode">Model response source unavailable</small></dd></div>
+          <div><dt>Shared review allowance</dt><dd><span id="native-allowance">Checking allowance…</span><small id="native-allowance-detail">Server-owned count; no local estimate</small></dd></div>
+        </dl>
+        <div class="native-access"><p><strong>Run synthetic reviews; read receipts.</strong><br><span id="native-limits">Concurrency and request interval unavailable.</span></p><button class="native-refresh" id="native-refresh" type="button">Refresh status</button></div>
+        <p class="native-health-note" id="native-health-note" role="status" aria-live="polite">Reading current IRIS status. Refreshing status does not run a review.</p>
+      </section>
     </header>
 
     <main class="workspace">
@@ -80,6 +89,9 @@
             <button type="button" class="case-choice" data-case="synthetic-b" aria-pressed="false"><span class="case-number">02</span><span><strong>Source mismatch</strong><small>References point to different studies</small></span><span class="case-arrow" aria-hidden="true">↗</span></button>
           </div>
           <div class="case-summary" aria-live="polite"><div><span>IMAGE STUDY</span><strong>study-a</strong></div><div><span>SELECTION STUDY</span><strong id="study-value">study-a</strong></div><p id="case-hint">The two synthetic references agree.</p></div>
+          <fieldset class="review-profile-picker"><legend>Model response source</legend><label><input type="radio" name="review-profile" value="default" checked> <span id="default-profile-label">Default IRIS profile · checking mode</span></label><label><input type="radio" name="review-profile" value="live"> Live Groq · temporary key</label></fieldset>
+          <p class="run-note" id="review-profile-note" role="status">Checking the default profile. Each completed receipt identifies its actual response source.</p>
+          <fieldset class="live-review-settings" id="live-review-settings" hidden disabled><legend>Temporary-key live review</legend><p id="live-capability-note">Temporary-key reviews are unavailable.</p><label for="live-api-key">Temporary Groq API key</label><input type="password" id="live-api-key" required autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="512" aria-describedby="live-key-note"><p id="live-key-note">Your key is sent only for this review and cleared from this field on submit, case/profile changes or leaving this page. It is not saved in browser storage.</p><label class="live-consent"><input type="checkbox" id="live-consent" required> <span>I authorize this demo to send this synthetic case and my temporary key to Groq. Groq may charge my account. This review can make up to 3 model calls with up to 1,024 output tokens per call. Input tokens are also billed.</span></label></fieldset>
           <button class="run-button" type="button" id="run-review"><span>Run native review</span><span aria-hidden="true">→</span></button>
           <p class="run-note" id="mode-note">Live IRIS workflow. Default: recorded model responses; live mode requires operator configuration.</p><p class="run-note" id="review-state" role="status" aria-live="polite"></p>
           <div class="outcome" id="outcome" hidden aria-live="polite"><span class="outcome-label">IRIS RULING · NATIVE EXECUTION</span><strong id="outcome-title"></strong><p id="outcome-text"></p><button class="text-button" type="button" id="outcome-book">Inspect the evidence →</button></div>
@@ -92,6 +104,6 @@
   </div>
 
   <dialog id="book-dialog" class="dialog" aria-labelledby="book-title"><div class="dialog-header"><div><p class="eyebrow">THE COUNCIL RECORD</p><h2 id="book-title">Book of Receipts</h2><p id="book-source">Fresh IRIS receipt · model response source identified below</p></div><button type="button" class="close-button" data-close="book-dialog" aria-label="Close Book of Receipts">×</button></div><div id="book-content"></div></dialog>
-  <dialog id="about-dialog" class="dialog about-dialog" aria-labelledby="about-title"><div class="dialog-header"><div><p class="eyebrow">ABOUT THIS EXPERIENCE</p><h2 id="about-title">A real workflow, synthetic evidence.</h2></div><button type="button" class="close-button" data-close="about-dialog" aria-label="Close about dialog">×</button></div><div class="about-copy"><p>Each submitted case runs the native AI Hub agent through the real IRIS Interoperability production. IRIS resolves the source evidence, validates the proposal and records a fresh disposition with its audit and message identities.</p><p>The default replays genuine recorded model completions rather than performing fresh inference. An operator can separately configure a live provider; each receipt identifies its model response source. This public page accepts no personal data and cannot approve or execute a task. Refresh retrieves the existing receipt without submitting another review.</p><p>The chamber is an original lightweight illustration. The separately licensed 3D knight files are not included.</p><p>Provider connections and operator-controlled approvals remain separate from this bounded public demonstration.</p></div></dialog>
+  <dialog id="about-dialog" class="dialog about-dialog" aria-labelledby="about-title"><div class="dialog-header"><div><p class="eyebrow">ABOUT THIS EXPERIENCE</p><h2 id="about-title">A real workflow, synthetic evidence.</h2></div><button type="button" class="close-button" data-close="about-dialog" aria-label="Close about dialog">×</button></div><div class="about-copy"><p>Each submitted case runs the native AI Hub agent through the real IRIS Interoperability production. IRIS resolves the source evidence, validates the proposal and records a fresh disposition with its audit and message identities.</p><p>The standard public configuration replays genuine recorded model completions rather than performing fresh inference. An operator can explicitly configure a live default profile; the header and each receipt identify the model response source. Only the fixed synthetic evidence cases can be submitted. This page cannot approve or execute a task. Refresh retrieves the existing receipt without submitting another review.</p><p>The chamber is an original lightweight illustration. The separately licensed 3D knight files are not included.</p><p>The default profile is configured by the operator. Where explicitly enabled, temporary-key reviews send only the selected synthetic case to the fixed Groq model after consent. An unconfirmed live response is recovered by its existing request identity; the page never switches it silently to replay. Operator-controlled approvals remain separate.</p></div></dialog>
 </body>
 </html>

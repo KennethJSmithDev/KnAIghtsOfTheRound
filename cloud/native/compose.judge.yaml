@@ -1,0 +1,43 @@
+name: kotr-judge-live
+
+services:
+  iris:
+    image: kotr-judge-live:local
+    pull_policy: never
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        IRIS_IMAGE: ${KOTR_IRIS_IMAGE:?Set an approved AI Hub Build 154 image by digest}
+    environment:
+      KOTR_CLOUD_PROVIDER_MODE: replay
+      KOTR_CLOUD_BYOK_ENABLED: "1"
+      KOTR_CLOUD_PUBLIC_ORIGIN: http://127.0.0.1:8080
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - data:/data
+    cpus: 2
+    mem_limit: 3g
+    shm_size: 64m
+    stop_grace_period: 600s
+    restart: "no"
+    labels:
+      org.kotr.owner: judge-local
+      org.kotr.purpose: synthetic-native-review
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "2"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=5).close()"]
+      interval: 10s
+      timeout: 7s
+      start_period: 120s
+      retries: 12
+
+volumes:
+  data:
+    labels:
+      org.kotr.owner: judge-local

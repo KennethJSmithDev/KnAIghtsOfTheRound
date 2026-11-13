@@ -1,6 +1,8 @@
 """Small public facade for the two synthetic reviews; IRIS owns every receipt."""
 import base64
 import http.client
+import hashlib
+import hmac
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
@@ -14,10 +16,22 @@ CASES = frozenset(("synthetic-a", "synthetic-b"))
 REQUEST_ID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\Z")
 ORIGIN = "https://kotr.sandbox.developer.intersystems.com"
 MAX_BODY = 256
+MAX_LIVE_BODY = 1024
+LEASE_ID = re.compile(r"[0-9a-f]{64}\Z")
+CONTROL_LABEL = b"kotr-cloud-byok-control-v1"
 MAX_RESPONSE = 32768
 BACKEND_PREFIX = "/csp/kotr-cloud/api"
 MODES = {"native-agent-model-replay": ("replay", "recorded-model-responses"),
          "native-agent-live": ("live", "live-provider")}
+
+
+def public_origin(value):
+    if value == ORIGIN:
+        return value
+    found = re.fullmatch(r"http://(?:127\.0\.0\.1|localhost):([1-9][0-9]{0,4})", value)
+    if found and int(found[1]) <= 65535:
+        return value
+    raise ValueError("Only the canonical HTTPS origin or an explicit loopback HTTP port is supported")
 
 
 class PublicError(Exception):
@@ -39,6 +53,7 @@ class IrisBackend:
         if not password or len(password) > 256 or any(c in password for c in "\r\n\x00"):
             raise ValueError("A valid runtime credential is required")
         self.authorization = "Basic " + base64.b64encode(("knaights_codex:" + password).encode()).decode()
+        self.control_authorization = "Bearer " + hmac.new(password.encode("utf-8"), CONTROL_LABEL, hashlib.sha256).hexdigest()
 
     def provider_health(self):
         connection = http.client.HTTPConnection("127.0.0.1", 11434, timeout=5)
@@ -58,6 +73,39 @@ class IrisBackend:
             raise PublicError(503, "PROVIDER_NOT_READY") from None
         finally:
             connection.close()
+
+    def lease_control(self, path, body):
+        connection = http.client.HTTPConnection("127.0.0.1", 11434, timeout=5)
+        try:
+            connection.request("POST", path, json.dumps(body, separators=(",", ":")).encode(),
+                {"Authorization": self.control_authorization, "Content-Type": "application/json"})
+            response = connection.getresponse()
+            data = response.read(2049)
+            if response.status != 200 or len(data) > 2048:
+                raise PublicError(409, "LIVE_REVIEW_UNAVAILABLE")
+            value = json.loads(data)
+            if not isinstance(value, dict) or value.get("status") != "OK":
+                raise PublicError(503, "LIVE_REVIEW_UNAVAILABLE")
+            return value
+        except PublicError:
+            raise
+        except Exception:
+            raise PublicError(503, "LIVE_REVIEW_UNAVAILABLE") from None
+        finally:
+            connection.close()
+
+    def prepare_live(self, request, key):
+        value = self.lease_control("/byok/prepare", {**request, "apiKey": key})
+        nonce = value.get("leaseId")
+        if not isinstance(nonce, str) or not LEASE_ID.fullmatch(nonce):
+            raise PublicError(503, "LIVE_REVIEW_UNAVAILABLE")
+        return nonce
+
+    def cancel_prepared(self, request_id, lease_id):
+        try:
+            self.lease_control("/byok/cancel", {"requestId": request_id, "leaseId": lease_id})
+        except Exception:
+            pass  # Pending keys expire; this cleanup never cancels an active owner.
 
     def call(self, method, path, body=None):
         # Destination and credentials never come from a public request. Redirects are not followed.
@@ -91,8 +139,9 @@ class IrisBackend:
 
 
 class Application:
-    def __init__(self, backend, assets):
+    def __init__(self, backend, assets, byok_enabled=False, origin=ORIGIN):
         self.backend, self.assets = backend, assets
+        self.byok_enabled, self.origin = byok_enabled, public_origin(origin)
         self.execution = threading.Semaphore(1)
         self.rate_lock = threading.Lock()
         self.last_submit = float("-inf")
@@ -106,8 +155,37 @@ class Application:
         provider = self.backend.provider_health()
         if provider.get("mode") != MODES[value["mode"]][0]:
             raise PublicError(503, "PROVIDER_MODE_MISMATCH")
-        return {"status": "OK", "running": True, "mode": value["mode"],
-                "production": "KnAIghts.Review.Production"}
+        provider_byok = provider.get("byok", {}).get("enabled", False) if isinstance(provider.get("byok", {}), dict) else None
+        native_byok, blocked = value.get("byokEnabled", False), value.get("newReviewsBlocked", False)
+        if (type(provider_byok) is not bool or type(native_byok) is not bool or type(blocked) is not bool
+                or provider_byok != self.byok_enabled or native_byok != self.byok_enabled
+                or (self.byok_enabled and "newReviewsBlocked" not in value)):
+            raise PublicError(503, "BYOK_PROFILE_MISMATCH")
+        result = {"status": "OK", "running": True, "mode": value["mode"],
+                  "production": "KnAIghts.Review.Production", "allowance": self.checked_allowance(value.get("allowance")),
+                  "newReviewsBlocked": blocked, "byok": {"available": False}}
+        if self.byok_enabled and not blocked:
+            result["byok"] = {"available": True, "provider": "Groq", "model": "openai/gpt-oss-20b",
+                              "maxCalls": 3, "maxTokensPerCall": 1024}
+        agent = value.get("agent")
+        if (isinstance(agent, dict) and agent.get("kind") == "native-ai-hub"
+                and agent.get("model") == "gpt-oss:20b" and agent.get("providerMode") == MODES[value["mode"]][1]):
+            result["agent"] = {key: agent[key] for key in ("kind", "model", "providerMode")}
+        return result
+
+    @staticmethod
+    def checked_allowance(value):
+        # Missing or invalid advisory data never invents capacity or changes readiness.
+        if not isinstance(value, dict) or value.get("status") != "OK" or value.get("scope") != "shared-retained-instance":
+            return {"status": "UNAVAILABLE"}
+        fields = ("limit", "used", "remaining", "maxConcurrent", "minIntervalSeconds")
+        if any(type(value.get(key)) is not int for key in fields):
+            return {"status": "UNAVAILABLE"}
+        limit, used = value["limit"], value["used"]
+        if (not 0 < limit <= 2147483647 or not 0 <= used <= limit or value["remaining"] != limit - used
+                or value["maxConcurrent"] != 1 or value["minIntervalSeconds"] != 2):
+            return {"status": "UNAVAILABLE"}
+        return {key: value[key] for key in ("status", "scope", *fields)}
 
     def review(self, request):
         if not self.execution.acquire(blocking=False):
@@ -122,6 +200,50 @@ class Application:
             return self.checked_run(value, request["requestId"], request["caseId"])
         finally:
             self.execution.release()
+
+    def live_review(self, request, key):
+        if not self.byok_enabled:
+            raise PublicError(404, "NOT_FOUND")
+        if not isinstance(key, str) or not 0 < len(key) <= 512 or any(not 33 <= ord(c) <= 126 for c in key):
+            raise PublicError(400, "INVALID_REQUEST")
+        if not self.execution.acquire(blocking=False):
+            raise PublicError(429, "REVIEW_BUSY")
+        nonce = None
+        try:
+            # Retrieval precedes any key lease: a duplicate never pays for another model attempt.
+            try:
+                prior = self.checked_run(self.backend.call("GET", "/state?requestId=" + request["requestId"]),
+                                         request["requestId"], request["caseId"])
+            except PublicError as error:
+                if error.status != 404:
+                    raise
+            else:
+                if prior["run"]["proposalKind"] != "native-agent-live":
+                    raise PublicError(409, "CORRELATION_MISMATCH")
+                return prior
+            if not self.health()["byok"]["available"]:
+                raise PublicError(409, "LIVE_REVIEW_UNAVAILABLE")
+            with self.rate_lock:
+                now = time.monotonic()
+                if now - self.last_submit < 2:
+                    raise PublicError(429, "REVIEW_RATE_LIMIT")
+                self.last_submit = now
+            nonce = self.backend.prepare_live(request, key)
+            key = None
+            value = self.backend.call("POST", "/reviews", json.dumps({**request, "leaseId": nonce}, separators=(",", ":")).encode())
+            result = self.checked_run(value, request["requestId"], request["caseId"])
+            if result["run"]["proposalKind"] != "native-agent-live":
+                raise PublicError(503, "LIVE_REVIEW_UNAVAILABLE")
+            return result
+        finally:
+            key = None
+            try:
+                if nonce is not None:
+                    self.backend.cancel_prepared(request["requestId"], nonce)
+            except Exception:
+                pass  # Cleanup is best-effort; active ownership stays at the provider and IRIS.
+            finally:
+                self.execution.release()
 
     def state(self, request_id):
         return self.checked_run(self.backend.call("GET", "/state?requestId=" + request_id), request_id)
@@ -212,15 +334,20 @@ class Handler(BaseHTTPRequestHandler):
             self.json(error.status, {"status": "ERROR", "error": error.code})
 
     def do_POST(self):
+        key, request, data = None, None, None
         try:
-            if self.path != "/api/reviews":
+            live = self.path == "/api/live-reviews"
+            if self.path != "/api/reviews" and not live:
                 raise PublicError(404, "NOT_FOUND")
-            if self.headers.get("Origin") not in (None, ORIGIN) or self.headers.get("Sec-Fetch-Site") not in (None, "same-origin", "none"):
+            if live and not self.server.app.byok_enabled:
+                raise PublicError(404, "NOT_FOUND")
+            if self.headers.get("Origin") not in (None, self.server.app.origin) or self.headers.get("Sec-Fetch-Site") not in (None, "same-origin", "none"):
                 raise PublicError(403, "ORIGIN_DENIED")
             if self.headers.get("Transfer-Encoding") or len(self.headers.get_all("Content-Length", [])) != 1:
                 raise PublicError(400, "INVALID_LENGTH")
             length = self.headers.get("Content-Length", "")
-            if len(length) > 3 or not length.isascii() or not length.isdecimal() or not 0 < int(length) <= MAX_BODY:
+            maximum = MAX_LIVE_BODY if live else MAX_BODY
+            if len(length) > 4 or not length.isascii() or not length.isdecimal() or not 0 < int(length) <= maximum:
                 raise PublicError(413, "BODY_TOO_LARGE")
             if self.headers.get("Content-Type", "").split(";", 1)[0].strip() != "application/json":
                 raise PublicError(415, "JSON_REQUIRED")
@@ -231,17 +358,27 @@ class Handler(BaseHTTPRequestHandler):
                 request = json.loads(data, object_pairs_hook=unique_object)
             except (ValueError, UnicodeError):
                 raise PublicError(400, "INVALID_JSON") from None
-            if not isinstance(request, dict) or set(request) != {"caseId", "requestId"}:
+            data = None
+            expected = {"caseId", "requestId", "apiKey", "consent"} if live else {"caseId", "requestId"}
+            if not isinstance(request, dict) or set(request) != expected:
                 raise PublicError(400, "INVALID_REQUEST")
             if (not isinstance(request["caseId"], str) or request["caseId"] not in CASES
                     or not isinstance(request["requestId"], str) or not REQUEST_ID.fullmatch(request["requestId"])):
                 raise PublicError(400, "INVALID_REQUEST")
-            self.json(200, self.server.app.review(request))
+            if live:
+                if request.pop("consent") is not True:
+                    raise PublicError(400, "CONSENT_REQUIRED")
+                key = request.pop("apiKey")
+                value = self.server.app.live_review(request, key)
+            else:
+                value = self.server.app.review(request)
+            self.json(200, value)
         except PublicError as error:
-            self.close_connection = True
             self.json(error.status, {"status": "ERROR", "error": error.code})
-        except (OSError, TimeoutError):
-            self.close_connection = True
+        except Exception:
+            self.json(503, {"status": "ERROR", "error": "REVIEW_UNAVAILABLE"})
+        finally:
+            key, request, data = None, None, None
 
 
 class Server(ThreadingHTTPServer):
@@ -282,7 +419,8 @@ def main():
     with password_file.open(encoding="utf-8") as source:
         password = source.read(258).rstrip("\n")
     backend = IrisBackend(password)
-    server = Server(("0.0.0.0", 8080), Application(backend, assets))
+    server = Server(("0.0.0.0", 8080), Application(backend, assets,
+        os.environ.get("KOTR_CLOUD_BYOK_ENABLED", "0") == "1", os.environ.get("KOTR_CLOUD_PUBLIC_ORIGIN", ORIGIN)))
     server.serve_forever(poll_interval=0.5)
 
 
