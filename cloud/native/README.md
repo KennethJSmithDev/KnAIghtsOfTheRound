@@ -1,10 +1,10 @@
 # Native synthetic cloud profile
 
-This optional profile is separate from the qualified twelve-class public IPM `0.1.0` package and from the complete local application. Its native replay foundation has been exercised on AI Hub Build 154. The temporary-key additions and local Compose profile described below are a review candidate; fresh native live execution and clean startup of this exact candidate remain unqualified.
+This optional fourteen-class profile is separate from the qualified twelve-class public IPM `0.1.0` package and from the complete local application. The [public native demo](https://kotr.sandbox.developer.intersystems.com/) runs on AI Hub Build 154. Both synthetic cases passed fresh Groq inference, IRIS validation, independent audit/message readback and completed-receipt recovery on the deployed image. The same image passed clean hosted startup and restart. The local Compose entry point below has been reviewed, but its startup has not been exercised. These results do not qualify the complete integrated application distribution.
 
 The browser submits one of two synthetic evidence cases. The IRIS AI Hub agent calls the real `ReadEvidence` tool, and the queued Interoperability operation validates the proposed decision and writes a new audit. The Book displays that audit and its persisted message/session identities.
 
-By default, the model transport replays genuine model messages recorded during earlier native runs. **Model replies are recorded; the intended IRIS agent, tool, validation, messages and audit execute in the current instance.** This profile does not claim fresh inference in replay mode. Source run identifiers in the replay fixture are provenance, not current audit identities.
+By default, the model transport replays genuine model messages recorded during earlier native runs. **In replay mode, model replies are recorded; the IRIS agent, tool, validation, messages and audit execute in the current instance.** This profile does not claim fresh inference in replay mode. Source run identifiers in the replay fixture are provenance, not current audit identities.
 
 ## Included components
 
@@ -33,7 +33,7 @@ IRIS permits one concurrent execution, at least two seconds between new starts, 
 
 Matching evidence should produce `ACCEPTED / SHOW_VERIFIED`; conflicting evidence should produce `REVIEW_REQUESTED / REQUEST_REVIEW` with no selected structure. Completing this review does not approve or execute an operator task.
 
-Compilation, startup, native execution and anonymous browser access are separate qualification gates. Consult the published qualification status before treating this source profile as a working deployment.
+Compilation, startup, native execution and anonymous browser access are separate qualification gates. The deployed image passed those gates for the two fixed synthetic cases. Both cases also passed fresh Groq execution through the public HTTPS endpoint. Desktop and mobile-emulated Book recovery used those retained live receipts without further inference; physical-phone performance and broad multi-user behavior remain unqualified.
 
 ## Judge-local live profile
 
@@ -59,7 +59,7 @@ docker compose -f cloud/native/compose.judge.yaml ps
 Invoke-RestMethod http://127.0.0.1:8080/api/health
 ```
 
-Stop this owned profile with `docker compose -f cloud/native/compose.judge.yaml down`. Its data volume remains; deleting it also deletes its receipts. Retain useful evidence before separately retiring that volume. Do not use global prune or remove another project's resources. Restart/recovery of this exact proposed profile still requires native qualification.
+Stop this owned profile with `docker compose -f cloud/native/compose.judge.yaml down`. Its data volume remains; deleting it also deletes its receipts. Retain useful evidence before separately retiring that volume. Do not use global prune or remove another project's resources. The deployed image passed clean restart and recovery of completed receipts in an isolated hosted fixture with model egress disconnected. This does not establish startup of the local Compose entry point or recovery of an interrupted active native worker.
 
 ## Temporary keys in an enabled public deployment
 
