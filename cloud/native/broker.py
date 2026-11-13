@@ -407,7 +407,16 @@ class Server(ThreadingHTTPServer):
             self.workers.release()
 
 
+def disable_core_dumps():
+    # The supported Linux runtime must not write credential-bearing process dumps.
+    import resource
+    resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+    if resource.getrlimit(resource.RLIMIT_CORE) != (0, 0):
+        raise RuntimeError("Core-dump retention is not disabled")
+
+
 def main():
+    disable_core_dumps()
     assets_dir = Path(os.environ.get("KOTR_CLOUD_ASSETS", "/opt/kotr-cloud/demo"))
     assets = {}
     for route, name, content_type in (("/", "index.html", "text/html; charset=utf-8"), ("/demo.js", "demo.js", "text/javascript; charset=utf-8"), ("/demo.css", "demo.css", "text/css; charset=utf-8")):

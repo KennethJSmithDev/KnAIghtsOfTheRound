@@ -388,7 +388,16 @@ class Server(ThreadingHTTPServer):
         pass  # Request bodies and upstream exception text never enter server logs.
 
 
+def disable_core_dumps():
+    # The supported Linux runtime must not write credential-bearing process dumps.
+    import resource
+    resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+    if resource.getrlimit(resource.RLIMIT_CORE) != (0, 0):
+        raise RuntimeError("Core-dump retention is not disabled")
+
+
 def main():
+    disable_core_dumps()
     fixtures = json.loads(Path(__file__).with_name("provider-fixtures.json").read_bytes())
     mode, key = os.environ.get("KOTR_CLOUD_PROVIDER_MODE", "replay"), None
     if mode == "live":
