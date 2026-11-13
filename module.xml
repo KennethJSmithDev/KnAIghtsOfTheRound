@@ -3,22 +3,34 @@
   <Document name="knaights-of-the-round.ZPM">
     <Module>
       <Name>knaights-of-the-round</Name>
-      <Version>0.1.0</Version>
-      <Description>Governed evidence review with InterSystems IRIS Interoperability and AI Hub</Description>
+      <Version>0.2.0</Version>
+      <Description>Integrated synthetic KotR package for a dedicated namespace</Description>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="KnAIghts.PKG"/>
-      <!-- Keep attribution in standard IPM exports and namespace-owned installs. -->
+      <SystemRequirements Version="&gt;=2026.3" IPMVersion="&gt;=0.10.9" Interoperability="enabled" Health="1"/>
       <FileCopy Name="NOTICE" Target="${ipmDir}${namespace}/NOTICE"/>
-      <!-- Build 154 generates the tool policy getter during compilation.
-           Compile its authorization class first after IPM has loaded source.
-           The compiler invocation requires the bare class name.
-           Keep this aligned with docker/bootstrap.script and test clean installs. -->
+      <!-- Stage immutable runtime inputs in an IPM-owned directory.
+           Operators provision their gateway, health paths, and schema before starting a profile. -->
+      <FileCopy Name="runtime/pex/knaights-pex.jar" Target="${ipmDir}${namespace}/kotr-runtime/pex/knaights-pex.jar"/>
+      <FileCopy Name="runtime/health/kotr_health.py" Target="${ipmDir}${namespace}/kotr-runtime/health/kotr_health.py"/>
+      <FileCopy Name="runtime/health/requirements.txt" Target="${ipmDir}${namespace}/kotr-runtime/health/requirements.txt"/>
+      <FileCopy Name="runtime/health/wheels/pydicom-3.0.2-py3-none-any.whl" Target="${ipmDir}${namespace}/kotr-runtime/health/wheels/pydicom-3.0.2-py3-none-any.whl"/>
+      <FileCopy Name="runtime/sql/context-index-v1.sql" Target="${ipmDir}${namespace}/kotr-runtime/sql/context-index-v1.sql"/>
+      <!-- Build 154 requires policy classes before compiling their generated tool getters. -->
       <Invoke Class="%SYSTEM.OBJ" Method="Compile" Phase="Compile" When="Before" CheckStatus="true">
         <Arg>KnAIghts.Review.CodexPolicy</Arg>
         <Arg>ck</Arg>
       </Invoke>
-      <SystemRequirements Version="&gt;=2026.3" Interoperability="enabled"/>
+      <Invoke Class="%SYSTEM.OBJ" Method="Compile" Phase="Compile" When="Before" CheckStatus="true">
+        <Arg>KnAIghts.Integration.Policy</Arg>
+        <Arg>ck</Arg>
+      </Invoke>
+      <Invoke Class="%SYSTEM.OBJ" Method="Compile" Phase="Compile" When="Before" CheckStatus="true">
+        <Arg>KnAIghts.Health.Policy</Arg>
+        <Arg>ck</Arg>
+      </Invoke>
+      <AfterInstallMessage>For synthetic use, configure the required local profile dependencies and explicitly start the selected production in this dedicated namespace.</AfterInstallMessage>
     </Module>
   </Document>
 </Export>

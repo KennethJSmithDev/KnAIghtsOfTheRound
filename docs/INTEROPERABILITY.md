@@ -86,11 +86,7 @@ zpm "install knaights-of-the-round"
 
 The independently tested public artifact is version `0.1.0`, 3,263,062 bytes, SHA-256 `e9d99f49e660b6398047d58e050285a1796ba8f0b915032270ba715ba10d88ad`. It contains twelve application classes plus repository documentation/assets; it is a different archive representation from the curated local TGZ below. Its fifteen core source/descriptor/license/notice inputs match the reviewed core exactly. [Registry metadata](https://pm.community.intersystems.com/packages/knaights-of-the-round) and [public archive](https://pm.community.intersystems.com/download/knaights-of-the-round/-/knaights-of-the-round-0.1.0.tgz) identify the actual package.
 
-Alternatively, build the curated twelve-class core archive from a clean checkout using Python 3.9 or later. The builder includes those core sources, module descriptor, LICENSE and NOTICE, and preserves existing output files. It does not package the expanded optional profiles.
-
-```powershell
-python scripts/package-ipm.py .local/knaights-of-the-round-0.1.0.tgz
-```
+For the qualified 0.1.0 core, use the [public 0.1.0 archive](https://pm.community.intersystems.com/download/knaights-of-the-round/-/knaights-of-the-round-0.1.0.tgz) or the registry installation above. The current root manifest describes the proposed full 0.2.0 package. Until the core builder is reconciled with that manifest, do not use its default output as a 0.1.0 core archive.
 
 Copy the archive into the owned container as `/tmp/knaights-of-the-round-0.1.0.tgz`. In the target namespace:
 
@@ -209,11 +205,11 @@ The native agent and authenticated MCP integrations have separate test coverage.
 
 ## Integrated source package boundary
 
-The default `scripts/package-ipm.py` still builds the separately qualified twelve-class core archive. A historical fourteen-class archive containing the two LiveSession classes passed local install, restart, uninstall and same-artifact reinstall. Those results do not qualify a newly built artifact or the larger optional source inventory. The opt-in integrated profile includes 59 classes and staged Java, Python and SQL inputs. Its local archive passed installation and lifecycle checks. The updated health parser and MLLP admission passed native FHIR, restricted MCP and transport checks from the installed archive. Unchanged Workflow/PEX/vector components retain their prior synthetic evidence. Each profile requires explicit runtime setup and production start. See [graphical distribution](GRAPHICAL_RELEASE.md), [health controls](HEALTH-CONTROLS.md) and [seats](SEATS-LOCAL.md) for their optional setup and limitations.
+The current default `scripts/package-ipm.py` needs reconciliation before use with the full 0.2.0 root manifest: its core-only output lacks the runtime files the new manifest requires. A historical fourteen-class archive containing the two LiveSession classes passed local install, restart, uninstall and same-artifact reinstall. Those results do not qualify a newly built artifact or the larger optional source inventory. The opt-in integrated profile includes 59 classes and staged Java, Python and SQL inputs. Its local archive passed installation and lifecycle checks. The updated health parser and MLLP admission passed native FHIR, restricted MCP and transport checks from the installed archive. Unchanged Workflow/PEX/vector components retain their prior synthetic evidence. Each profile requires explicit runtime setup and production start. See [graphical distribution](GRAPHICAL_RELEASE.md), [health controls](HEALTH-CONTROLS.md) and [seats](SEATS-LOCAL.md) for their optional setup and limitations.
 
 ## Opt-in integrated source profile
 
-The `0.2.0` source update preserves the public twelve-class IPM `0.1.0` package.
+The existing public twelve-class IPM `0.1.0` package remains available. The root `module.xml` and package source layout are being prepared locally for a full 59-class `knaights-of-the-round` 0.2.0 distribution; its fresh installation and public registry delivery are not yet qualified.
 `module.integrated.xml` defines a separate, local `0.1.0-local.1` profile with
 59 source classes and staged Java, Python and SQL inputs. Use a dedicated empty
 namespace: the two modules share class names and are not a side-by-side install.
