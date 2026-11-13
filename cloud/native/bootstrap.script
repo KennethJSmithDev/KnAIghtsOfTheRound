@@ -1,0 +1,65 @@
+Set $ETRAP="Write !,""KOTR_CLOUD_BOOTSTRAP_FAIL runtime error"",! Halt"
+Set sc=$SYSTEM.OBJ.Load("/opt/knaights/src/KnAIghts/Review/CodexPolicy.cls","ck")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=$SYSTEM.OBJ.LoadDir("/opt/knaights/src","ck",.errors,1)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set sc=$SYSTEM.OBJ.LoadDir("/opt/knaights/cloud","ck",.errors,1)
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set $Namespace="%SYS"
+If '##class(Security.Resources).Exists("KnAIghtsSeatUse") Set sc=##class(Security.Resources).Create("KnAIghtsSeatUse","Restricted synthetic cloud review","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+If '##class(Security.Roles).Exists("KnAIghtsCloudReader") Set sc=##class(Security.Roles).Create("KnAIghtsCloudReader","Cloud synthetic review only","KnAIghtsSeatUse:U,%DB_USER:R,%DB_IRISLIB:R,%DB_ENSLIB:R,%DB_HSLIB:R,%DB_IRISTEMP:RW","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+If '##class(Security.Roles).Exists("KnAIghtsCloudMessage") Set sc=##class(Security.Roles).Create("KnAIghtsCloudMessage","Cloud CSP request message persistence","%DB_USER:RW","")
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+For role="KnAIghtsCloudReader","KnAIghtsCloudMessage" {
+    Kill p,expected
+    Set sc=##class(Security.Roles).Get(role,.p)
+    If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+    If $Get(p("GrantedRoles"))'="" { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL unexpected inherited roles",! Halt }
+    Set grants=$Select(role="KnAIghtsCloudReader":"KnAIghtsSeatUse:U,%DB_USER:R,%DB_IRISLIB:R,%DB_ENSLIB:R,%DB_HSLIB:R,%DB_IRISTEMP:RW",1:"%DB_USER:RW")
+    For i=1:1:$Length(grants,",") { Set item=$Piece(grants,",",i),expected($Piece(item,":",1))=$Piece(item,":",2) }
+    Set actual=$Get(p("Resources"))
+    If $Length(actual,",")'=$Length(grants,",") { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL unexpected role resource count",! Halt }
+    For i=1:1:$Length(actual,",") {
+        Set item=$Piece(actual,",",i),name=$Piece(item,":",1),permissions=$Piece(item,":",2)
+        If $Get(expected(name),"!")'=permissions { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL unexpected role resources",! Halt }
+        Kill expected(name)
+    }
+}
+Kill p,expected,actual,grants,item,name,permissions,role,i
+Kill p
+Set sc=##class(Security.Users).Get("knaights_codex",.p)
+If $SYSTEM.Status.IsError(sc) {
+    Set file=##class(%Stream.FileCharacter).%New(),file.Filename=$SYSTEM.Util.GetEnviron("KOTR_CLOUD_SEAT_PASSWORD_FILE")
+    If file.Filename="" { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL missing secret path",! Halt }
+    Set password=$ZStrip(file.Read(),"<>W")
+    If $Length(password)<32 { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL invalid secret",! Halt }
+    Kill p
+    Set p("Roles")="KnAIghtsCloudReader",p("Password")=password,p("Enabled")=1,p("ChangePassword")=0,p("NameSpace")="USER"
+    Set sc=##class(Security.Users).Create("knaights_codex",.p)
+    Kill p,file,password
+    If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+} Else {
+    If ($Get(p("Roles"))'="KnAIghtsCloudReader")!('$Get(p("Enabled")))!($Get(p("ChangePassword"))) { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL unexpected principal configuration",! Halt }
+}
+Kill p
+Set sc=##class(Security.Applications).Get("/csp/kotr-cloud",.p)
+If $SYSTEM.Status.IsError(sc) {
+    Kill p
+    Set p("NameSpace")="USER",p("DispatchClass")="KnAIghts.CloudDemo.Api",p("Enabled")=1,p("Type")=2,p("AutheEnabled")=32,p("Resource")="KnAIghtsSeatUse",p("MatchRoles")="KnAIghtsCloudReader:KnAIghtsCloudMessage"
+    Set sc=##class(Security.Applications).Create("/csp/kotr-cloud",.p)
+    If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+} Else {
+    If ($Get(p("NameSpace"))'="USER")!($Get(p("DispatchClass"))'="KnAIghts.CloudDemo.Api")!($Get(p("AutheEnabled"))'=32)!($Get(p("Resource"))'="KnAIghtsSeatUse")!($Get(p("MatchRoles"))'="KnAIghtsCloudReader:KnAIghtsCloudMessage")!($Get(p("Type"))'=2)!('$Get(p("Enabled"))) { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL unexpected application configuration",! Halt }
+}
+Kill p
+Set $Namespace="USER"
+Set rows=##class(%SQL.Statement).%ExecDirect(,"GRANT SELECT ON Ens.MessageHeader TO KnAIghtsCloudMessage")
+If rows.%SQLCODE'=0 { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL message read grant",! Halt }
+Set sc=##class(KnAIghts.Review.App).Start()
+If $SYSTEM.Status.IsError(sc) { Do $SYSTEM.Status.DisplayError(sc) Halt }
+Set runtime=##class(KnAIghts.Review.App).Status()
+If ('runtime.%Get("running"))!('runtime.%Get("liveEnabled"))!(##class(KnAIghts.CloudDemo.State).Mode()="") { Write !,"KOTR_CLOUD_BOOTSTRAP_FAIL native profile unavailable",! Halt }
+Write !,"KOTR_CLOUD_BOOTSTRAP_OK",!
+Halt

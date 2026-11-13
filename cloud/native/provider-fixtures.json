@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "mode": "native-agent-model-replay",
+  "disclosure": "Model messages were recorded during genuine native AI Hub runs. The model is not called again in replay mode. The agent, evidence tool, Interoperability production, validation and new audit execute in the current IRIS instance.",
+  "model": "gpt-oss:20b",
+  "toolCall": {
+    "role": "assistant",
+    "content": "",
+    "tool_calls": [
+      {
+        "id": "call_kotr_replay_read_evidence",
+        "type": "function",
+        "function": {
+          "name": "ReadEvidence",
+          "arguments": "{}"
+        }
+      }
+    ]
+  },
+  "cases": {
+    "synthetic-a": {
+      "expectedToolResult": {
+        "ctStudy": "urn:example:study-a",
+        "evidenceRefs": [
+          "ImagingStudy/example-ct",
+          "ImagingSelection/example-segment"
+        ],
+        "kind": "synthetic",
+        "segStudy": "urn:example:study-a",
+        "selectionId": "synthetic.structure.001"
+      },
+      "finalMessage": {
+        "role": "assistant",
+        "content": "{\"action\":\"SHOW_VERIFIED\",\"citations\":[\"ImagingStudy/example-ct\",\"ImagingSelection/example-segment\"]}"
+      },
+      "finalContentSha256": "85e40f7bc7e29f9b058105a3f1aba5781517383426b59eda2e7f1e5758ee84c9",
+      "provenance": {
+        "recordedAtUtc": "2026-11-08T06:06:44.347917+00:00",
+        "sourceCompletionNumber": 2,
+        "sourceInteropSessionId": 2,
+        "sourceAuditId": 1
+      }
+    },
+    "synthetic-b": {
+      "expectedToolResult": {
+        "ctStudy": "urn:example:study-a",
+        "evidenceRefs": [
+          "ImagingStudy/example-ct",
+          "ImagingSelection/example-segment"
+        ],
+        "kind": "synthetic",
+        "segStudy": "urn:example:study-b",
+        "selectionId": "synthetic.structure.001"
+      },
+      "finalMessage": {
+        "role": "assistant",
+        "content": "{\"action\":\"REQUEST_REVIEW\",\"citations\":[\"ImagingStudy/example-ct\",\"ImagingSelection/example-segment\"]}"
+      },
+      "finalContentSha256": "86287a7055861923bd0dc694d16d8e2acad7e8e8f3563d20ce494d696ce4afe0",
+      "provenance": {
+        "recordedAtUtc": "2026-11-08T06:06:48.128775+00:00",
+        "sourceCompletionNumber": 4,
+        "sourceInteropSessionId": 4,
+        "sourceAuditId": 2
+      }
+    }
+  },
+  "provenance": {
+    "recordedDateUtc": "2026-11-08",
+    "sourceRuntime": "IRIS for Health AI Hub Community Build 154",
+    "sourceCommit": "86346e488d68f60b39bbc3c3b764bb2bfba9e802",
+    "sourceResponseTraceSha256": "f683feb98366a37e1914deb18d7cfa67ab06800eb6ff05a9f6b1f3b38dcc5a10",
+    "sourceRequestTraceSha256": "504e176beec7907d90dea2c701aa30f6febcef2cdb83accb0d28410ee5932dbf",
+    "sourceIndependentReadbackSha256": "2399260eaeabd3095b1fa3ceeb863af37f9320d25af9ee6552916f97cc1cbf80",
+    "sourceIndependentResultSha256": "c76b941e633da19f7004a188ce1d762e3d38ada0c784fa5925c9599be24f8492",
+    "sourceTraceVerificationSha256": "d18200291d0abe587301da0db98d9877b822aeea08d35c6c0dbef409b143c0b7",
+    "sanitization": [
+      "Only the ReadEvidence function call, final public answer content and synthetic tool evidence are retained.",
+      "The shared tool-call identifier is normalized for replay; original provider IDs, reasoning, usage estimates, private paths, account state and environment records are omitted.",
+      "Retained source session and audit identities are provenance only, never the current IRIS execution identities."
+    ]
+  }
+}

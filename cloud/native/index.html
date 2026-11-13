@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12100f">
+  <meta name="description" content="Run a synthetic KnAIghts of The Round review through a live IRIS Interoperability production.">
+  <title>KnAIghts of The Round — The Council Chamber</title>
+  <link rel="stylesheet" href="./demo.css">
+  <script type="module" src="./demo.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="KnAIghts of The Round, start over">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 35 9v12c0 9-6 14-15 17C11 35 5 30 5 21V9Z"/><path d="M20 8v21M11 16h18M14 25l6 6 6-6"/></svg>
+        <span><strong>KnAIghts <small>of The Round</small></strong><span>THE COUNCIL CHAMBER</span></span>
+      </a>
+      <div class="topbar-right"><span class="simulation-badge"><span aria-hidden="true"></span> LIVE IRIS</span><button class="info-button" type="button" id="about-open" aria-label="About this native demo">i</button></div>
+    </header>
+
+    <main class="workspace">
+      <div class="workspace-heading">
+        <div><p class="eyebrow">A SEAT AT THE ROUND TABLE</p><h1>The evidence is on the table.</h1><p>Follow a synthetic case through the AI Hub agent and a running IRIS production.</p></div>
+        <div class="view-switch" role="group" aria-label="Workspace view"><button type="button" data-view="chamber" aria-pressed="true">Chamber</button><button type="button" data-view="dashboard" aria-pressed="false">Dashboard</button></div>
+      </div>
+
+      <div class="workspace-grid">
+        <section class="chamber-card" id="chamber" data-projection="waiting" aria-label="Round Table chamber">
+          <div class="scene-head"><span><i aria-hidden="true"></i> THE COUNCIL IS READY</span><span>ARTHUR’S VIEW</span></div>
+          <div class="scene-wrap">
+            <svg class="chamber-scene" viewBox="0 0 1000 600" role="img" aria-labelledby="scene-title scene-desc" preserveAspectRatio="xMidYMid slice">
+              <title id="scene-title">The Round Table</title><desc id="scene-desc">A stylized chamber with three council seats, a round table, an evidence projection, and a book.</desc>
+              <defs>
+                <linearGradient id="room" x2="0" y2="1"><stop stop-color="#14191b"/><stop offset="1" stop-color="#221b18"/></linearGradient>
+                <linearGradient id="wall" x2="0" y2="1"><stop stop-color="#313131"/><stop offset="1" stop-color="#161b1c"/></linearGradient>
+                <linearGradient id="table" x2="0" y2="1"><stop stop-color="#8d5c3b"/><stop offset=".62" stop-color="#4d2e24"/><stop offset="1" stop-color="#251916"/></linearGradient>
+                <linearGradient id="helm" x2="1" y2="1"><stop stop-color="#d4d6c9"/><stop offset=".47" stop-color="#737d7a"/><stop offset="1" stop-color="#323e3d"/></linearGradient>
+                <linearGradient id="light" x2="0" y2="1"><stop stop-color="#8ef0e2" stop-opacity=".65"/><stop offset="1" stop-color="#51bdba" stop-opacity=".04"/></linearGradient>
+                <symbol id="knight" viewBox="0 0 140 205">
+                  <path d="M20 200v-71Q20 108 40 99l14-6h32l14 6q20 9 20 30v71Z" fill="#252a29" stroke="#8c765c" stroke-width="3"/>
+                  <path d="M26 139 7 115l25-21 31 18-8 35Zm88 0 19-24-25-21-31 18 8 35Z" fill="url(#helm)" stroke="#242c2c" stroke-width="4"/>
+                  <path d="M47 103q23 11 46 0l11 17-9 63H45l-9-63Z" fill="#555f5b" stroke="#d1b075" stroke-width="2"/>
+                  <path d="m70 112 18 12-5 35-13 13-13-13-5-35Z" fill="#333e3c" stroke="#b59b72" stroke-width="2"/>
+                  <path d="M45 38q0-31 25-31t25 31v31q-5 20-25 26Q50 89 45 69Z" fill="url(#helm)" stroke="#1b2424" stroke-width="4"/>
+                  <path d="M46 48h48M70 12v75M53 59l13 4m21-4-13 4" fill="none" stroke="#293535" stroke-width="4"/>
+                </symbol>
+              </defs>
+              <rect width="1000" height="600" fill="url(#room)"/>
+              <path d="M0 0h1000v370H0z" fill="url(#wall)"/>
+              <path d="M0 348 500 260l500 88v252H0Z" fill="#1b1c1b"/>
+              <path d="M0 426 500 295l500 131M0 530 500 300l500 230M170 600 500 303l330 297" fill="none" stroke="#4e4034" stroke-width="3" opacity=".48"/>
+              <path d="M34 0h80v318l-80 23Zm852 0h80v341l-80-23ZM289 0h43v271l-43 8Zm379 0h43v279l-43-8Z" fill="#272c2b" stroke="#4e4940" stroke-width="3"/>
+              <path d="M130 30h122v220H130zm618 0h122v220H748zM361 18h278v165H361z" fill="#101718" stroke="#574a37" stroke-width="6"/>
+              <path d="M190 31v219M130 105h122M809 31v219M748 105h122M500 18v165M361 100h278" fill="none" stroke="#43453e" stroke-width="4"/>
+              <path d="M0 334 500 251l500 83" fill="none" stroke="#b68a52" stroke-width="3" opacity=".55"/>
+              <g opacity=".85"><path d="M153 198v-38m-8 39h16M847 198v-38m-8 39h16" stroke="#c7a36c" stroke-width="5"/><path d="M153 151c-14-16 0-23 0-31 0 8 14 15 0 31m694 0c-14-16 0-23 0-31 0 8 14 15 0 31" fill="#dcad6f"/></g>
+              <g transform="translate(170 150) scale(.9)"><use href="#knight" width="140" height="205"/></g>
+              <g transform="translate(430 91) scale(1.03)"><use href="#knight" width="140" height="205"/></g>
+              <g transform="translate(690 150) scale(.9)"><use href="#knight" width="140" height="205"/></g>
+              <path d="M186 364q314-112 628 0l-23 87q-291 108-582 0Z" fill="#2b1b17" stroke="#9a7048" stroke-width="5"/>
+              <ellipse cx="500" cy="361" rx="335" ry="118" fill="url(#table)" stroke="#d0a16a" stroke-width="7"/>
+              <ellipse cx="500" cy="359" rx="301" ry="91" fill="none" stroke="#c79a65" stroke-width="2" opacity=".7"/>
+              <path d="M234 359h530M500 269v181" stroke="#d7ab78" stroke-width="1" opacity=".19"/>
+              <g class="projector"><ellipse cx="500" cy="365" rx="94" ry="25" fill="#1a2c2b" stroke="#76c6b6" stroke-width="3"/><ellipse cx="500" cy="362" rx="75" ry="18" fill="#5fc4b5" opacity=".16"/><path d="M438 357 469 191h62l31 166Z" fill="url(#light)"/><path class="selection-marker" d="M500 201 530 254 500 287 470 254Z" fill="#8be1d5" opacity=".65" stroke="#d3fff0" stroke-width="2"/><path class="selection-marker" d="M500 201v86m-30-33h60" stroke="#effff7" stroke-width="1.5" opacity=".8"/></g>
+              <g transform="translate(544 435) rotate(-7)"><path d="M0 0h146v74H0Z" fill="#311d19" stroke="#d4ab6f" stroke-width="3"/><path d="M7 7h132v59H7Z" fill="#63382a" stroke="#c39560"/><path d="M73 13v47" stroke="#d2a873"/><text x="73" y="31" text-anchor="middle" fill="#f2d5a2" font-family="Georgia,serif" font-size="8" letter-spacing="1">BOOK OF</text><text x="73" y="44" text-anchor="middle" fill="#f2d5a2" font-family="Georgia,serif" font-size="11" letter-spacing="1">RECEIPTS</text></g>
+              <path d="M0 600v-51l126-71 90 122Zm1000 0v-51l-126-71-90 122Z" fill="#291e1a" stroke="#8b6745" stroke-width="6"/>
+            </svg>
+            <div class="scene-caption" aria-live="polite"><span class="caption-kicker" id="speaker">THE COUNCIL</span><p id="scene-message">Choose a case below to begin.</p></div>
+            <button type="button" class="book-button" id="book-open"><span aria-hidden="true">▤</span> Open Book of Receipts <span aria-hidden="true">↗</span></button>
+          </div>
+          <div class="scene-foot"><span>◈ &nbsp; SYNTHETIC EVIDENCE</span><span>LIVE IRIS · MODEL RESPONSE REPLAY</span></div>
+        </section>
+
+        <section class="case-panel" aria-labelledby="case-heading">
+          <div class="panel-heading"><div><p class="eyebrow">THE CASE BEFORE US</p><h2 id="case-heading">Choose the evidence</h2></div><span class="panel-icon" aria-hidden="true">✦</span></div>
+          <p class="panel-intro">Two records, one question: do their sources agree?</p>
+          <div class="case-list" role="group" aria-label="Synthetic case">
+            <button type="button" class="case-choice" data-case="synthetic-a" aria-pressed="true"><span class="case-number">01</span><span><strong>Matching sources</strong><small>Image and selection share a study</small></span><span class="case-arrow" aria-hidden="true">↗</span></button>
+            <button type="button" class="case-choice" data-case="synthetic-b" aria-pressed="false"><span class="case-number">02</span><span><strong>Source mismatch</strong><small>References point to different studies</small></span><span class="case-arrow" aria-hidden="true">↗</span></button>
+          </div>
+          <div class="case-summary" aria-live="polite"><div><span>IMAGE STUDY</span><strong>study-a</strong></div><div><span>SELECTION STUDY</span><strong id="study-value">study-a</strong></div><p id="case-hint">The two synthetic references agree.</p></div>
+          <button class="run-button" type="button" id="run-review"><span>Run native review</span><span aria-hidden="true">→</span></button>
+          <p class="run-note" id="mode-note">Live IRIS workflow. Default: recorded model responses; live mode requires operator configuration.</p><p class="run-note" id="review-state" role="status" aria-live="polite"></p>
+          <div class="outcome" id="outcome" hidden aria-live="polite"><span class="outcome-label">IRIS RULING · NATIVE EXECUTION</span><strong id="outcome-title"></strong><p id="outcome-text"></p><button class="text-button" type="button" id="outcome-book">Inspect the evidence →</button></div>
+        </section>
+
+        <section class="dashboard-card" id="dashboard" hidden aria-labelledby="dashboard-title"><div class="panel-heading"><div><p class="eyebrow">THE SAME CASE, A DIFFERENT VIEW</p><h2 id="dashboard-title">Case dashboard</h2></div><span class="panel-icon" aria-hidden="true">◈</span></div><div id="dashboard-content"></div><button class="text-button" type="button" id="dashboard-book">Open Book of Receipts →</button></section>
+      </div>
+    </main>
+    <footer class="footer"><span><i aria-hidden="true"></i> LIVE IRIS · SYNTHETIC DATA</span><span>AI proposes. IRIS validates. An operator retains authority.</span></footer>
+  </div>
+
+  <dialog id="book-dialog" class="dialog" aria-labelledby="book-title"><div class="dialog-header"><div><p class="eyebrow">THE COUNCIL RECORD</p><h2 id="book-title">Book of Receipts</h2><p id="book-source">Fresh IRIS receipt · model response source identified below</p></div><button type="button" class="close-button" data-close="book-dialog" aria-label="Close Book of Receipts">×</button></div><div id="book-content"></div></dialog>
+  <dialog id="about-dialog" class="dialog about-dialog" aria-labelledby="about-title"><div class="dialog-header"><div><p class="eyebrow">ABOUT THIS EXPERIENCE</p><h2 id="about-title">A real workflow, synthetic evidence.</h2></div><button type="button" class="close-button" data-close="about-dialog" aria-label="Close about dialog">×</button></div><div class="about-copy"><p>Each submitted case runs the native AI Hub agent through the real IRIS Interoperability production. IRIS resolves the source evidence, validates the proposal and records a fresh disposition with its audit and message identities.</p><p>The default replays genuine recorded model completions rather than performing fresh inference. An operator can separately configure a live provider; each receipt identifies its model response source. This public page accepts no personal data and cannot approve or execute a task. Refresh retrieves the existing receipt without submitting another review.</p><p>The chamber is an original lightweight illustration. The separately licensed 3D knight files are not included.</p><p>Provider connections and operator-controlled approvals remain separate from this bounded public demonstration.</p></div></dialog>
+</body>
+</html>
