@@ -81,6 +81,7 @@ if ! grep -qx 'KOTR_CLOUD_BOOTSTRAP_OK' "$output"; then
     echo 'Cloud compilation, security setup or production start did not complete.' >&2
     exit 1
 fi
-python3 -B /opt/kotr-cloud/provider.py &
-python3 -B /opt/kotr-cloud/broker.py &
+# Release iris-main's hook pipes; the HTTP health check establishes readiness.
+python3 -B /opt/kotr-cloud/provider.py </dev/null >/dev/null 2>&1 &
+python3 -B /opt/kotr-cloud/broker.py </dev/null >/dev/null 2>&1 &
 echo 'KOTR_CLOUD_SERVICES_STARTED'
