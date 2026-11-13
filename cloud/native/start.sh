@@ -58,7 +58,7 @@ try:
     lines = text.splitlines()
     selected = set()
     for i, line in enumerate(lines):
-        if re.search(r'(?i)ERROR|FATAL|EXCEPTION|SYNTAX|KOTR_CLOUD_(?:BOOTSTRAP|STAGE)|COMPILATION', line):
+        if re.search(r'(?i)ERROR|FATAL|EXCEPTION|SYNTAX|KOTR_CLOUD_(?:BOOTSTRAP|STAGE|POLICY)|COMPILATION', line):
             selected.update(range(max(0, i - 1), min(len(lines), i + 3)))
     context = '\n'.join(lines[i] for i in sorted(selected)[-160:])
     print('KOTR_CLOUD_BOOTSTRAP_CONTEXT_BEGIN')
